@@ -1,0 +1,149 @@
+# ===================================================================
+#  Decap CMS – Konfiguration
+#  ANPASSEN: die drei mit  <-- ANPASSEN  markierten Zeilen.
+# ===================================================================
+
+backend:
+  name: github
+  repo: jazzybunnystudios/jazzybunny.github.io
+  branch: main
+  # URL deines Cloudflare Workers (ohne Slash am Ende).
+  # Der Worker übernimmt nur den GitHub-Login – es gibt keine eigene Nutzerdatenbank.
+  base_url: https://decap-oauth.DEIN-SUBDOMAIN.workers.dev   # <-- ANPASSEN nach dem Worker-Deploy
+  auth_endpoint: auth
+
+# Lokales Testen: `npx decap-server` starten, dann http://localhost:8080/admin/ öffnen.
+# Wird nur auf localhost verwendet und auf der Live-Seite ignoriert.
+local_backend: true
+
+locale: de
+
+media_folder: "images/uploads"     # Speicherort der Bilder im Repo
+public_folder: "/images/uploads"   # Pfad, der in den JSON-Dateien landet
+
+site_url: https://jazzybunny-studios.com
+display_url: https://jazzybunny-studios.com
+show_preview_links: false
+
+collections:
+  - name: gallery
+    label: Galerie
+    label_singular: Galerie
+    delete: false
+    files:
+      - name: items
+        label: Objekte
+        file: content/gallery.json
+        format: json
+        description: >-
+          Bilder und Beschreibungen deiner Objekte. Einträge lassen sich per
+          Drag & Drop sortieren – die Reihenfolge hier ist die Reihenfolge
+          auf der Webseite.
+        fields:
+          - label: Objekte
+            name: items
+            widget: list
+            label_singular: Objekt
+            collapsed: true
+            summary: "{{fields.title}}"
+            fields:
+              - label: Hauptbild
+                name: image
+                widget: image
+                hint: Wird als Vorschaubild in der Galerie angezeigt.
+
+              - label: Titel
+                name: title
+                widget: string
+
+              - label: Beschreibung
+                name: description
+                widget: text
+                required: false
+
+              - label: Kategorie
+                name: category
+                widget: string
+                required: false
+                hint: >-
+                  z. B. "Deko", "Ersatzteile", "Figuren". Aus den Kategorien
+                  werden automatisch Filter-Buttons auf der Seite erzeugt.
+
+              - label: Material
+                name: material
+                widget: string
+                required: false
+                hint: 'z. B. "PLA", "PETG", "Resin"'
+
+              - label: Weitere Bilder
+                name: gallery
+                widget: list
+                required: false
+                collapsed: true
+                summary: Zusatzbild
+                fields:
+                  - label: Bild
+                    name: image
+                    widget: image
+
+  - name: settings
+    label: Einstellungen
+    delete: false
+    files:
+      - name: site
+        label: Seite & Kontakt
+        file: content/settings.json
+        format: json
+        fields:
+          - label: Seitentitel
+            name: title
+            widget: string
+
+          - label: Untertitel
+            name: tagline
+            widget: string
+            required: false
+
+          - label: Intro-Text
+            name: about
+            widget: text
+            required: false
+            hint: Der Text unter dem Logo auf der Startseite.
+
+          - label: Logo (groß)
+            name: logo
+            widget: image
+            required: false
+            hint: >-
+              Das große Logo auf der Startseite. Enthält bereits den Schriftzug.
+              Leer lassen zeigt stattdessen den Seitentitel als Text.
+
+          - label: Logo-Symbol (quadratisch)
+            name: logo_mark
+            widget: image
+            required: false
+            hint: Kleines quadratisches Logo für die Kopfzeile.
+
+          - label: E-Mail
+            name: email
+            widget: string
+            required: false
+
+          - label: Instagram
+            name: instagram
+            widget: string
+            required: false
+            hint: Nur der Benutzername, z. B. meinprofil
+
+          - label: Telefon
+            name: phone
+            widget: string
+            required: false
+
+          - label: Impressum
+            name: imprint
+            widget: text
+            required: false
+            hint: >-
+              In Deutschland für gewerbliche Seiten Pflicht (§ 5 DDG):
+              Name, Anschrift, E-Mail. Leer lassen blendet den Link aus.

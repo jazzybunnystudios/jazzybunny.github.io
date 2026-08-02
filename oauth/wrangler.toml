@@ -1,0 +1,14 @@
+name = "decap-oauth"
+main = "worker.js"
+compatibility_date = "2026-06-01"
+
+[vars]
+# Client ID der GitHub OAuth App (ist nicht geheim).
+GITHUB_CLIENT_ID = "HIER_CLIENT_ID_EINTRAGEN"
+
+# Origins, an die das Login-Token gesendet werden darf – ohne Pfad, ohne Slash am Ende.
+# Mehrere mit Komma trennen. localhost ist fürs lokale Testen.
+ALLOWED_ORIGINS = "https://jazzybunny-studios.com,https://www.jazzybunny-studios.com,http://localhost:4173"
+
+# GITHUB_CLIENT_SECRET wird NICHT hier eingetragen, sondern als Secret gesetzt:
+#   npx wrangler secret put GITHUB_CLIENT_SECRET
