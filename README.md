@@ -170,6 +170,20 @@ oauth/worker.js         Cloudflare Worker für den GitHub-Login
 .nojekyll               Schaltet Jekyll auf GitHub Pages ab
 ```
 
+## Wenn du `admin/config.yml` änderst
+
+GitHub Pages liefert Dateien mit `Cache-Control: max-age=600` aus, und Decap lädt die
+Config per JavaScript nach – ein normales Neuladen holt sie also nicht zwingend neu.
+Deshalb steht in `admin/index.html`:
+
+```html
+<link href="config.yml?v=2" type="text/yaml" rel="cms-config-url">
+```
+
+**Nach jeder Änderung an `config.yml` die Zahl hochzählen** (`?v=3`, `?v=4`, …). Sonst
+arbeitest du bis zu zehn Minuten mit der alten Fassung weiter und suchst den Fehler an
+der falschen Stelle.
+
 ## Logo austauschen
 
 Die beiden Logo-Dateien liegen als Felder im Admin-Bereich unter **Einstellungen →
