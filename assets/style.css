@@ -211,6 +211,41 @@ body.maintenance-on .site-footer { display: none; }
   padding: 3px 9px; border-radius: 999px; backdrop-filter: blur(4px);
 }
 
+/* ---------- NSFW ---------- */
+.card-media.is-nsfw img { filter: blur(24px); transform: scale(1.15); }
+.card:hover .card-media.is-nsfw img { transform: scale(1.15); }
+
+.nsfw-overlay, .lb-reveal {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  background: rgba(10,10,14,.42);
+  color: #fff; font-size: .82rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.nsfw-overlay { position: absolute; inset: 0; }
+.nsfw-overlay small, .lb-reveal small {
+  font-size: .68rem; font-weight: 500; letter-spacing: .04em;
+  text-transform: none; opacity: .85;
+}
+
+/* Kennzeichen neben dem Titel */
+.tag-nsfw {
+  display: inline-block; margin-left: 8px; vertical-align: middle;
+  background: var(--accent); color: var(--accent-fg);
+  font-size: .64rem; font-weight: 700; letter-spacing: .1em;
+  padding: 3px 7px; border-radius: 5px;
+}
+
+/* Großansicht: verdeckt, bis der Knopf geklickt wird.
+   Liegt in derselben Rasterzelle wie das Bild, damit er nur dieses überdeckt
+   und nicht den Beschreibungstext daneben. */
+.lb-reveal {
+  grid-column: 1; grid-row: 1;
+  border: 0; cursor: pointer; z-index: 2; width: 100%; height: 100%;
+}
+.lightbox:not(.nsfw-hidden) .lb-reveal { display: none; }
+.lightbox.nsfw-hidden #lb-img { filter: blur(40px); transform: scale(1.1); }
+.lightbox.nsfw-hidden .lb-thumbs img { filter: blur(10px); }
+
 .card-body { padding: 15px 17px 18px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
 .card-body h3 { margin: 0; font-size: 1.03rem; letter-spacing: -.01em; }
 .card-body p {
@@ -280,9 +315,13 @@ body.maintenance-on .site-footer { display: none; }
   border-radius: 16px; overflow: hidden;
   max-width: 1120px; width: 100%; max-height: 86vh;
 }
-#lb-img { width: 100%; height: 100%; max-height: 86vh; object-fit: contain; background: #0b0c0f; }
+/* Bild und Verdeckungs-Knopf teilen sich bewusst dieselbe Zelle. */
+#lb-img {
+  grid-column: 1; grid-row: 1;
+  width: 100%; height: 100%; max-height: 86vh; object-fit: contain; background: #0b0c0f;
+}
 
-.lb-caption { padding: 26px 26px 28px; overflow-y: auto; max-height: 86vh; }
+.lb-caption { grid-column: 2; grid-row: 1; padding: 26px 26px 28px; overflow-y: auto; max-height: 86vh; }
 .lb-caption h3 { margin: 0 0 6px; font-size: 1.35rem; letter-spacing: -.02em; }
 .lb-caption p { margin: 0 0 12px; color: var(--fg-muted); font-size: .94rem; white-space: pre-line; }
 .lb-meta { font-size: .82rem !important; text-transform: uppercase; letter-spacing: .06em; color: var(--accent) !important; }
@@ -309,7 +348,7 @@ body.maintenance-on .site-footer { display: none; }
 @media (max-width: 860px) {
   .lb-figure { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; max-height: 88vh; }
   #lb-img { max-height: 50vh; }
-  .lb-caption { max-height: 38vh; padding: 20px; }
+  .lb-caption { grid-column: 1; grid-row: 2; max-height: 38vh; padding: 20px; }
   .lb-nav { top: auto; bottom: 12px; transform: none; }
   .hero { padding: 48px 0 34px; }
   .header-nav a[href="#galerie"] { display: none; }

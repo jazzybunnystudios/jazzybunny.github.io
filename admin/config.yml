@@ -56,6 +56,16 @@ collections:
                 name: title
                 widget: string
 
+              - label: NSFW
+                name: nsfw
+                widget: boolean
+                default: false
+                required: false
+                hint: >-
+                  An = Bild wird in der Galerie unscharf angezeigt und
+                  bekommt ein NSFW-Kennzeichen neben dem Titel. Besucher
+                  decken es mit einem Klick selbst auf.
+
               - label: Beschreibung
                 name: description
                 widget: text

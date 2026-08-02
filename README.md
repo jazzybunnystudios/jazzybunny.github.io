@@ -190,6 +190,24 @@ Solange du lokal am Code arbeitest (`assets/`, `admin/`, `index.html`) und das C
 den Inhalten (`content/`, `images/uploads/`), gibt es dabei nie Konflikte – ihr fasst
 verschiedene Dateien an.
 
+## NSFW-Kennzeichnung
+
+Jedes Objekt hat im Admin einen Umschalter **NSFW**. Ist er an:
+
+* Das Vorschaubild in der Galerie ist unscharf, mit dem Hinweis „Zum Anzeigen klicken".
+* Neben dem Titel steht ein **NSFW**-Kennzeichen – auch nach dem Aufdecken.
+* Der erste Klick auf die Kachel deckt nur auf, erst der zweite öffnet die Großansicht.
+  So landet nichts versehentlich formatfüllend am Bildschirm.
+* Blättert man in der Großansicht auf ein noch verdecktes Objekt, ist es dort ebenfalls
+  unscharf und muss einzeln aufgedeckt werden.
+
+Aufgedeckt bleibt es nur für den aktuellen Besuch – nach einem Neuladen ist wieder alles
+verdeckt.
+
+> Auch das ist eine Anzeige-Entscheidung im Browser, keine Zugangssperre: Die Bilddatei
+> selbst liegt unverändert unter `images/uploads/` und ist über ihre direkte Adresse
+> abrufbar. Für eine echte Altersprüfung reicht das nicht.
+
 ## Seite vorübergehend sperren
 
 Im Admin unter **Einstellungen → Seite & Kontakt** ganz oben der Schalter

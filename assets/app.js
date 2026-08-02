@@ -244,6 +244,16 @@
       img.decoding = 'async';
       media.appendChild(img);
 
+      if (isHidden(item)) {
+        media.classList.add('is-nsfw');
+        var veil = el('span', 'nsfw-overlay');
+        veil.appendChild(document.createTextNode('NSFW'));
+        var sub = el('small');
+        sub.textContent = 'Zum Anzeigen klicken';
+        veil.appendChild(sub);
+        media.appendChild(veil);
+      }
+
       var count = imagesOf(item).length;
       if (count > 1) {
         var badge = el('span', 'card-count');
@@ -255,6 +265,7 @@
       var body = el('div', 'card-body');
       var h3 = el('h3');
       h3.textContent = item.title || 'Ohne Titel';
+      if (item.nsfw) h3.appendChild(nsfwTag());
       body.appendChild(h3);
 
       if (item.description) {
@@ -273,9 +284,36 @@
       if (tags.children.length) body.appendChild(tags);
 
       card.appendChild(body);
-      card.addEventListener('click', function () { openLightbox(index, 0); });
+
+      // Bei NSFW macht der erste Klick nur scharf – erst der zweite öffnet die
+      // Großansicht. So landet nichts versehentlich formatfüllend am Schirm.
+      card.addEventListener('click', function () {
+        if (isHidden(item)) {
+          revealed.add(item);
+          media.classList.remove('is-nsfw');
+          var v = media.querySelector('.nsfw-overlay');
+          if (v) v.remove();
+          return;
+        }
+        openLightbox(index, 0);
+      });
+
       grid.appendChild(card);
     });
+  }
+
+  /* ---------- NSFW ---------- */
+  var revealed = new Set();
+
+  /** true, solange ein als NSFW markiertes Objekt noch verdeckt ist. */
+  function isHidden(item) {
+    return !!item.nsfw && !revealed.has(item);
+  }
+
+  function nsfwTag() {
+    var t = el('span', 'tag-nsfw');
+    t.textContent = 'NSFW';
+    return t;
   }
 
   /* ---------- Lightbox ---------- */
@@ -311,7 +349,11 @@
     img.src = mediaUrl(imgs[imgIndex]);
     img.alt = item.title || 'Objekt';
 
+    // Beim Blättern kann man auf einem noch verdeckten Objekt landen.
+    lb.classList.toggle('nsfw-hidden', isHidden(item));
+
     $('#lb-title').textContent = item.title || 'Ohne Titel';
+    if (item.nsfw) $('#lb-title').appendChild(nsfwTag());
     $('#lb-meta').textContent = [item.category, item.material].filter(Boolean).join(' · ');
     $('#lb-desc').textContent = item.description || '';
 
@@ -351,6 +393,13 @@
     }
     updateLightbox();
   }
+
+  lb.querySelector('.lb-reveal').addEventListener('click', function () {
+    var item = visibleItems[lbIndex];
+    if (item) revealed.add(item);
+    lb.classList.remove('nsfw-hidden');
+    render(visibleItems); // Kachel im Hintergrund gleich mit aufdecken
+  });
 
   lb.querySelector('.lb-close').addEventListener('click', closeLightbox);
   lb.querySelector('.lb-prev').addEventListener('click', function () { step(-1); });
