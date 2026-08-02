@@ -4,7 +4,7 @@ compatibility_date = "2026-06-01"
 
 [vars]
 # Client ID der GitHub OAuth App (ist nicht geheim).
-GITHUB_CLIENT_ID = "HIER_CLIENT_ID_EINTRAGEN"
+GITHUB_CLIENT_ID = "Ov23liE47YAnjOL2S9k3"
 
 # Origins, an die das Login-Token gesendet werden darf – ohne Pfad, ohne Slash am Ende.
 # Mehrere mit Komma trennen. localhost ist fürs lokale Testen.

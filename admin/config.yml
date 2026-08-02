@@ -9,7 +9,7 @@ backend:
   branch: main
   # URL deines Cloudflare Workers (ohne Slash am Ende).
   # Der Worker übernimmt nur den GitHub-Login – es gibt keine eigene Nutzerdatenbank.
-  base_url: https://decap-oauth.DEIN-SUBDOMAIN.workers.dev   # <-- ANPASSEN nach dem Worker-Deploy
+  base_url: https://decap-oauth.jazzybunny.workers.dev
   auth_endpoint: auth
 
 # Lokales Testen: `npx decap-server` starten, dann http://localhost:8080/admin/ öffnen.
