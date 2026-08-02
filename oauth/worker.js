@@ -89,8 +89,10 @@ async function handleCallback(request, url, env) {
         'user-agent': 'decap-cms-oauth-worker',
       },
       body: JSON.stringify({
-        client_id: env.GITHUB_CLIENT_ID,
-        client_secret: env.GITHUB_CLIENT_SECRET,
+        // trim(): beim Einfügen rutscht leicht ein Leerzeichen oder Zeilenumbruch
+        // mit, und GitHub meldet dann nur "client_id and/or client_secret incorrect".
+        client_id: String(env.GITHUB_CLIENT_ID).trim(),
+        client_secret: String(env.GITHUB_CLIENT_SECRET).trim(),
         code,
         redirect_uri: `${url.origin}/callback`,
       }),
