@@ -170,6 +170,26 @@ oauth/worker.js         Cloudflare Worker für den GitHub-Login
 .nojekyll               Schaltet Jekyll auf GitHub Pages ab
 ```
 
+## Arbeiten am Code, wenn das CMS in Benutzung ist
+
+Decap CMS committet direkt ins Repository. Jedes „Publish" im Admin erzeugt also einen
+Commit auf GitHub, den du lokal nicht hast. Ein `git push` wird dann abgelehnt:
+
+```
+! [rejected]  main -> main (fetch first)
+```
+
+Das ist kein Fehler, sondern der Schutz davor, deine über das CMS gepflegten Inhalte
+zu überschreiben. Vor jedem Push deshalb:
+
+```bash
+git pull --rebase origin main
+```
+
+Solange du lokal am Code arbeitest (`assets/`, `admin/`, `index.html`) und das CMS an
+den Inhalten (`content/`, `images/uploads/`), gibt es dabei nie Konflikte – ihr fasst
+verschiedene Dateien an.
+
 ## Seite vorübergehend sperren
 
 Im Admin unter **Einstellungen → Seite & Kontakt** ganz oben der Schalter
