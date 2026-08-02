@@ -5,6 +5,14 @@
       "title": "Placeholder",
       "description": "Placeholder",
       "category": "Placeholder"
+    },
+    {
+      "nsfw": true,
+      "image": "/images/uploads/bild_2026-08-02_180623977.png",
+      "title": "Placeholder NSFW",
+      "description": "Placeholder",
+      "category": "Placeholder",
+      "material": "Placeholder"
     }
   ]
 }
