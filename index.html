@@ -9,7 +9,17 @@
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
-<body>
+<body class="booting">
+
+<!-- Wartungsansicht: wird nur gezeigt, wenn im Admin "Seite gesperrt" aktiv ist. -->
+<section id="maintenance" class="maintenance" hidden>
+  <div class="wrap">
+    <img class="maintenance-logo" id="maintenance-logo" src="assets/logo.webp" alt="JazzyBunny Studios" width="860" height="860">
+    <h1 id="maintenance-title">Wir sind derzeit nicht erreichbar</h1>
+    <p id="maintenance-text"></p>
+    <div id="maintenance-contact" class="contact-links"></div>
+  </div>
+</section>
 
 <header class="site-header">
   <div class="wrap header-inner">

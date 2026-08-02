@@ -135,6 +135,34 @@ html[data-theme="light"] .ico-moon { display: none; }
 }
 .hero-logo[hidden] { display: none; }
 
+/* ---------- Wartungsansicht ----------
+   Bis die Einstellungen geladen sind, bleibt die Seite unsichtbar. Sonst
+   blitzt bei gesperrter Seite kurz die Galerie auf. Die Klasse wird in
+   app.js in jedem Fall wieder entfernt – auch wenn das Laden scheitert. */
+body.booting .site-header,
+body.booting main,
+body.booting .site-footer { visibility: hidden; }
+
+body.maintenance-on .site-header,
+body.maintenance-on main,
+body.maintenance-on .site-footer { display: none; }
+
+.maintenance {
+  min-height: 100vh; display: grid; place-items: center;
+  text-align: center; padding: 48px 20px;
+}
+.maintenance[hidden] { display: none; }
+.maintenance-logo { width: min(300px, 62vw); height: auto; margin: 0 auto 30px; border-radius: 18px; }
+.maintenance h1 {
+  margin: 0 0 16px; font-size: clamp(1.6rem, 4.5vw, 2.5rem);
+  letter-spacing: -.02em; line-height: 1.15;
+}
+.maintenance p {
+  margin: 0 auto 28px; max-width: 52ch; color: var(--fg-muted);
+  font-size: clamp(1rem, 2.2vw, 1.1rem); white-space: pre-line;
+}
+.maintenance p:empty { display: none; }
+
 /* Nur für Screenreader und Suchmaschinen sichtbar. */
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; margin: -1px;

@@ -95,6 +95,29 @@ collections:
         file: content/settings.json
         format: json
         fields:
+          - label: Seite gesperrt
+            name: maintenance
+            widget: boolean
+            default: false
+            hint: >-
+              An = Besucher sehen statt der Galerie einen Hinweis. Der
+              Admin-Bereich bleibt erreichbar, du kommst also jederzeit
+              wieder rein. Achtung: das ist ein Hinweisschild, keine
+              Zugangssperre – direkt aufgerufene Bilddateien bleiben
+              abrufbar.
+
+          - label: Text bei gesperrter Seite
+            name: maintenance_title
+            widget: string
+            required: false
+            default: Wir sind derzeit nicht erreichbar
+
+          - label: Zusatztext bei gesperrter Seite
+            name: maintenance_text
+            widget: text
+            required: false
+            hint: Optional, z. B. wann es weitergeht.
+
           - label: Seitentitel
             name: title
             widget: string

@@ -170,6 +170,21 @@ oauth/worker.js         Cloudflare Worker für den GitHub-Login
 .nojekyll               Schaltet Jekyll auf GitHub Pages ab
 ```
 
+## Seite vorübergehend sperren
+
+Im Admin unter **Einstellungen → Seite & Kontakt** ganz oben der Schalter
+**„Seite gesperrt"**. Ist er an, sehen Besucher statt der Galerie einen Hinweis mit
+Logo, Text und – falls hinterlegt – deinen Kontaktdaten. Überschrift und Zusatztext
+sind in den beiden Feldern darunter frei einstellbar.
+
+Der Admin-Bereich unter `/admin/` bleibt dabei erreichbar, du sperrst dich also nicht
+aus. `content/gallery.json` wird bei gesperrter Seite gar nicht erst geladen.
+
+> **Das ist ein Hinweisschild, keine Zugangssperre.** GitHub Pages liefert nur
+> statische Dateien aus, es gibt keinen Server, der Anfragen abweisen könnte. Wer die
+> direkte Adresse einer Datei unter `images/uploads/` kennt, kann sie weiterhin
+> abrufen. Für „wir machen gerade Pause" reicht das; für Vertrauliches nicht.
+
 ## Wenn du `admin/config.yml` änderst
 
 GitHub Pages liefert Dateien mit `Cache-Control: max-age=600` aus, und Decap lädt die

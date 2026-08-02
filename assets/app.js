@@ -42,22 +42,61 @@
     });
   }
 
-  loadJSON('content/settings.json').then(applySettings).catch(function (err) {
-    console.warn('Einstellungen nicht geladen:', err);
-  });
+  // Erst die Einstellungen – daraus ergibt sich, ob die Galerie überhaupt
+  // geladen wird oder die Wartungsansicht kommt.
+  loadJSON('content/settings.json')
+    .catch(function (err) {
+      console.warn('Einstellungen nicht geladen:', err);
+      return {};
+    })
+    .then(function (s) {
+      s = s || {};
+      applySettings(s);
+      document.body.classList.remove('booting');
 
-  loadJSON('content/gallery.json').then(function (data) {
-    show($('#state-loading'), false);
-    var items = (data && Array.isArray(data.items) ? data.items : []).filter(function (it) {
-      return it && it.image;
+      if (s.maintenance) {
+        showMaintenance(s);
+        return;
+      }
+      loadGallery();
     });
-    if (!items.length) { show($('#state-empty'), true); return; }
-    initGallery(items);
-  }).catch(function (err) {
-    console.error(err);
-    show($('#state-loading'), false);
-    show($('#state-error'), true);
-  });
+
+  function loadGallery() {
+    loadJSON('content/gallery.json').then(function (data) {
+      show($('#state-loading'), false);
+      var items = (data && Array.isArray(data.items) ? data.items : []).filter(function (it) {
+        return it && it.image;
+      });
+      if (!items.length) { show($('#state-empty'), true); return; }
+      initGallery(items);
+    }).catch(function (err) {
+      console.error(err);
+      show($('#state-loading'), false);
+      show($('#state-error'), true);
+    });
+  }
+
+  /* ---------- Wartungsansicht ---------- */
+  function showMaintenance(s) {
+    document.body.classList.add('maintenance-on');
+
+    var heading = s.maintenance_title || 'Wir sind derzeit nicht erreichbar';
+    document.title = (s.title ? s.title + ' – ' : '') + heading;
+    $('#maintenance-title').textContent = heading;
+    $('#maintenance-text').textContent = s.maintenance_text || '';
+
+    var logo = $('#maintenance-logo');
+    if (s.logo) {
+      logo.src = mediaUrl(s.logo);
+      logo.alt = s.title || 'Logo';
+    }
+    if (s.logo === '') show(logo, false);
+
+    // Erreichbar bleiben, auch wenn die Galerie zu ist.
+    buildContactLinks($('#maintenance-contact'), s, false);
+
+    show($('#maintenance'), true);
+  }
 
   /* ---------- Einstellungen anwenden ---------- */
   function applySettings(s) {
@@ -87,12 +126,23 @@
     if (s.logo_mark) mark.src = mediaUrl(s.logo_mark);
     if (s.logo_mark === '') show(mark, false);
 
-    var links = $('#contact-links');
+    buildContactLinks($('#contact-links'), s, true);
+
+    if (s.imprint && String(s.imprint).trim()) {
+      $('#imprint-content').innerHTML = miniMarkdown(String(s.imprint));
+      show($('#imprint-open'), true);
+    }
+  }
+
+  /** Baut die Kontakt-Buttons. withHint blendet bei leeren Daten einen Hinweis ein. */
+  function buildContactLinks(container, s, withHint) {
+    container.textContent = '';
+
     if (s.email) {
       var a = el('a');
       a.href = 'mailto:' + s.email;
       a.textContent = s.email;
-      links.appendChild(a);
+      container.appendChild(a);
     }
     if (s.instagram) {
       var handle = String(s.instagram).replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/\/$/, '');
@@ -101,23 +151,18 @@
       ig.rel = 'noopener';
       ig.target = '_blank';
       ig.textContent = '@' + handle;
-      links.appendChild(ig);
+      container.appendChild(ig);
     }
     if (s.phone) {
       var tel = el('a');
       tel.href = 'tel:' + String(s.phone).replace(/[^\d+]/g, '');
       tel.textContent = s.phone;
-      links.appendChild(tel);
+      container.appendChild(tel);
     }
-    if (!links.children.length) {
+    if (!container.children.length && withHint) {
       var hint = el('p');
       hint.textContent = 'Kontaktdaten können im Admin-Bereich hinterlegt werden.';
-      links.appendChild(hint);
-    }
-
-    if (s.imprint && String(s.imprint).trim()) {
-      $('#imprint-content').innerHTML = miniMarkdown(String(s.imprint));
-      show($('#imprint-open'), true);
+      container.appendChild(hint);
     }
   }
 
