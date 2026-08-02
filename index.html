@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>JazzyBunny Studios</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #181818;
+      background:
+        radial-gradient(circle at top, #ffffff 0%, #f4f4f4 55%, #ececec 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      width: 100%;
+      padding: 35px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 7px;
+      text-transform: uppercase;
+    }
+
+    .status {
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: #777;
+      text-transform: uppercase;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .content {
+      max-width: 900px;
+      animation: fadeIn 1.2s ease;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 35px;
+      padding: 10px 18px;
+      border: 1px solid #d7d7d7;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #777;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: clamp(50px, 9vw, 120px);
+      font-weight: 300;
+      letter-spacing: 18px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .line {
+      width: 70px;
+      height: 1px;
+      background: #cfcfcf;
+      margin: 40px auto;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.8;
+      letter-spacing: 4px;
+      color: #707070;
+      text-transform: uppercase;
+    }
+
+    footer {
+      padding: 30px 20px;
+      text-align: center;
+      font-size: 11px;
+      color: #999;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 700px) {
+      header {
+        padding: 25px;
+      }
+
+      .logo {
+        font-size: 14px;
+        letter-spacing: 4px;
+      }
+
+      .status {
+        display: none;
+      }
+
+      h1 {
+        letter-spacing: 8px;
+      }
+
+      p {
+        font-size: 12px;
+        letter-spacing: 2px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">JazzyBunny Studios</div>
+    <div class="status">Gallery in development</div>
+  </header>
+
+  <main>
+    <div class="content">
+
+      <div class="badge">Official Website</div>
+
+      <h1>Coming Soon</h1>
+
+      <div class="line"></div>
+
+      <p>
+        Our digital figure gallery is currently being created.<br>
+        New models, dimensions and details will be available soon.
+      </p>
+
+    </div>
+  </main>
+
+  <footer>
+    © 2026 JazzyBunny Studios
+  </footer>
+
+</body>
+</html>
