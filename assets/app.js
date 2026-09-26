@@ -490,7 +490,7 @@
     if (searchTerm) {
       var q = searchTerm.toLowerCase();
       list = list.filter(function (it) {
-        return [it.title, it.description, it.category, it.material, it.colors]
+        return [it.title, it.description, it.category, it.material, it.colors, it.product_id]
           .filter(Boolean).join(' ').toLowerCase().indexOf(q) !== -1;
       });
     }
@@ -702,7 +702,8 @@
       ['Farben', item.colors],
       ['Druckzeit', item.print_time],
       ['Verfügbarkeit', item.status],
-      ['Preis', item.price_note]
+      ['Preis', item.price_note],
+      ['Produkt-ID', item.product_id]
     ].forEach(function (row) {
       if (!row[1]) return;
       var dt = el('dt'); dt.textContent = row[0];
@@ -714,8 +715,10 @@
   function buildCta(item) {
     var cta = $('#lb-cta');
     if (settings.email) {
-      cta.href = 'mailto:' + settings.email +
-        '?subject=' + encodeURIComponent('Anfrage: ' + (item.title || 'Objekt'));
+      // Produkt-ID mit in den Betreff – erspart Rückfragen, welches Teil gemeint ist.
+      var betreff = 'Anfrage: ' + (item.title || 'Objekt');
+      if (item.product_id) betreff += ' (' + item.product_id + ')';
+      cta.href = 'mailto:' + settings.email + '?subject=' + encodeURIComponent(betreff);
       txt(cta, 'Nach diesem Objekt fragen');
     } else {
       cta.href = '#kontakt';

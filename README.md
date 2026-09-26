@@ -115,6 +115,7 @@ die Reihenfolge auf der Webseite. Pro Objekt:
 |---|---|
 | Hauptbild | Vorschaubild in der Galerie. Hochformat wirkt am besten |
 | Titel, Kategorie | Kategorien erzeugen automatisch Filter-Knöpfe und Kachel-Vorschauen |
+| Produkt-ID | Deine eigene Kennung, z. B. „JB-042". Steht in der Detailansicht, ist über die Suche findbar und landet im Betreff der Anfrage-Mail |
 | NSFW | Bild unscharf, Kennzeichen neben dem Titel |
 | Neu | Grünes Schild „Neu" oben links auf dem Bild |
 | Highlight | Erscheint zusätzlich oben im Abschnitt „Highlights" |

@@ -61,6 +61,16 @@ collections:
                 name: title
                 widget: string
 
+              - label: Produkt-ID
+                name: product_id
+                widget: string
+                required: false
+                hint: >-
+                  Deine eigene Nummer oder Kennung, z. B. "JB-042" oder
+                  "VASE-01". Erscheint in der Detailansicht bei den Angaben
+                  und lässt sich über die Suche finden. Leer lassen = wird
+                  nicht angezeigt.
+
               - label: Kategorie
                 name: category
                 widget: string
