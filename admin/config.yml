@@ -79,6 +79,16 @@ collections:
                   An = Bild wird unscharf angezeigt, mit NSFW-Kennzeichen
                   neben dem Titel. Besucher decken es selbst auf.
 
+              - label: Neu
+                name: is_new
+                widget: boolean
+                default: false
+                required: false
+                hint: >-
+                  An = grünes Schild "Neu" oben links auf dem Bild und in der
+                  Detailansicht. Einfach wieder ausschalten, wenn das Objekt
+                  nicht mehr neu ist.
+
               - label: Highlight auf der Startseite
                 name: featured
                 widget: boolean
@@ -91,13 +101,14 @@ collections:
                 widget: select
                 required: false
                 options:
-                  - Neu
                   - Bestseller
                   - Limitiert
                   - Einzelstück
                   - Auf Anfrage
                   - Nicht verfügbar
-                hint: Kleines farbiges Schild oben links auf dem Bild. Leer lassen = keins.
+                hint: >-
+                  Zweites Schild neben "Neu", in der Akzentfarbe. Leer lassen
+                  = keins. Beide lassen sich kombinieren.
 
               - label: Beschreibung
                 name: description
@@ -178,17 +189,13 @@ collections:
               Großes Bild hinter dem Logo ganz oben. Wird automatisch
               abgedunkelt, damit Schrift lesbar bleibt. Leer lassen = schlicht.
 
-          - label: Logo auf der Startseite zeigen
-            name: show_logo
-            widget: boolean
-            default: true
-            required: false
-
           - label: Überschrift
             name: hero_title
             widget: string
             required: false
-            hint: Leer lassen, wenn nur das Logo stehen soll.
+            hint: >-
+              Die große Schlagzeile auf der Bühne. Leer lassen übernimmt den
+              Seitentitel aus den Einstellungen.
 
           - label: Unterzeile
             name: hero_subtitle
@@ -353,17 +360,16 @@ collections:
             required: false
             hint: Erscheint auf der Bühne und in der Fußzeile.
 
-          - label: Logo (groß)
+          - label: Logo (Wortmarke)
             name: logo
             widget: image
             required: false
-            hint: Enthält bereits den Schriftzug. Leer lassen zeigt stattdessen den Titel als Text.
-
-          - label: Logo-Symbol (quadratisch)
-            name: logo_mark
-            widget: image
-            required: false
-            hint: Kleines Logo für Kopf- und Fußzeile.
+            hint: >-
+              Steht oben links in der Kopfzeile, in der Fußzeile und auf der
+              Sperrseite. Querformat mit transparentem Hintergrund, etwa
+              10:1 breit zu hoch. Weiße Schrift wird im hellen Design
+              automatisch dunkel eingefärbt – das klappt nur bei einfarbigen
+              Logos. Leer lassen zeigt stattdessen den Seitentitel als Text.
 
           - label: Akzentfarbe
             name: accent

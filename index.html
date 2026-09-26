@@ -9,15 +9,15 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="JazzyBunny Studios">
 <meta property="og:description" content="Galerie für individuelle 3D-Druck Objekte">
-<link rel="stylesheet" href="assets/style.css?v=2">
-<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/style.css?v=4">
+<link rel="icon" type="image/png" href="assets/favicon.png?v=2">
 </head>
 <body class="booting">
 
 <!-- Wartungsansicht: nur sichtbar, wenn im Admin "Seite gesperrt" aktiv ist -->
 <section id="maintenance" class="maintenance" hidden>
   <div class="wrap">
-    <img class="maintenance-logo" id="maintenance-logo" src="assets/logo.webp" alt="JazzyBunny Studios">
+    <img class="maintenance-logo" id="maintenance-logo" src="assets/wordmark.webp" alt="JazzyBunny Studios">
     <h1 id="maintenance-title">Wir sind derzeit nicht erreichbar</h1>
     <p id="maintenance-text"></p>
     <div id="maintenance-contact" class="contact-links"></div>
@@ -39,11 +39,7 @@
     </button>
 
     <a class="brand" href="#top">
-      <img class="brand-mark" id="brand-mark" src="assets/logo-mark.webp" alt="" width="40" height="40">
-      <span class="brand-text">
-        <strong data-site="title">JazzyBunny Studios</strong>
-        <small data-site="tagline"></small>
-      </span>
+      <img class="brand-logo" id="brand-logo" src="assets/wordmark.webp" alt="JazzyBunny Studios" width="900" height="85">
     </a>
 
     <nav class="main-nav" id="main-nav">
@@ -82,8 +78,8 @@
   <section class="hero" id="hero">
     <div class="hero-bg" id="hero-bg" hidden></div>
     <div class="wrap hero-inner">
-      <img class="hero-logo" id="hero-logo" src="assets/logo.webp" alt="JazzyBunny Studios">
-      <h1 id="hero-title" class="visually-hidden" data-site="title">JazzyBunny Studios</h1>
+      <span class="hero-kicker" id="hero-kicker"></span>
+      <h1 id="hero-title" data-site="title">JazzyBunny Studios</h1>
       <p class="hero-sub" id="hero-sub"></p>
       <div class="hero-actions" id="hero-actions">
         <a class="btn btn-primary" id="hero-cta" href="#katalog">Zur Galerie</a>
@@ -180,7 +176,7 @@
 <footer class="site-footer">
   <div class="wrap footer-grid">
     <div class="footer-col footer-brand">
-      <img class="footer-logo" id="footer-logo" src="assets/logo-mark.webp" alt="" width="52" height="52">
+      <img class="footer-logo" id="footer-logo" src="assets/wordmark.webp" alt="" width="900" height="85">
       <p class="footer-about" id="footer-about"></p>
     </div>
     <div class="footer-col">
@@ -241,6 +237,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=2"></script>
+<script src="assets/app.js?v=4"></script>
 </body>
 </html>

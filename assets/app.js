@@ -93,16 +93,19 @@
         n.textContent = s.title;
       });
     }
-    if (s.tagline) txt($('[data-site="tagline"]'), s.tagline);
-
-    setImage($('#hero-logo'), s.logo, s.title);
-    setImage($('#maintenance-logo'), s.logo, s.title);
-    setImage($('#brand-mark'), s.logo_mark || s.logo, '');
-    setImage($('#footer-logo'), s.logo_mark || s.logo, '');
+    // Eine einzige Wortmarke für Kopfzeile, Fußzeile und Wartungsansicht.
+    setImage($('#brand-logo'), s.logo, s.title || 'Logo');
+    setImage($('#footer-logo'), s.logo, '');
+    setImage($('#maintenance-logo'), s.logo, s.title || 'Logo');
 
     if (s.logo === '') {
-      show($('#hero-logo'), false);
-      $('#hero-title').classList.remove('visually-hidden');
+      // Ohne Logo tritt der Seitenname als Text an seine Stelle.
+      [$('#brand-logo'), $('#footer-logo'), $('#maintenance-logo')].forEach(function (n) {
+        show(n, false);
+      });
+      var name = el('strong', 'brand-fallback');
+      name.textContent = s.title || 'Startseite';
+      $('.brand').appendChild(name);
     }
 
     txt($('#footer-about'), s.about || '');
@@ -231,14 +234,9 @@
       show(bg, true);
       document.body.classList.add('has-hero-bg');
     }
-    if (h.show_logo === false) {
-      show($('#hero-logo'), false);
-      $('#hero-title').classList.remove('visually-hidden');
-    }
-    if (h.hero_title) {
-      $('#hero-title').classList.remove('visually-hidden');
-      txt($('#hero-title'), h.hero_title);
-    }
+    // Überschrift in der Zierschrift, Untertitel als kleine Zeile darüber.
+    if (h.hero_title) txt($('#hero-title'), h.hero_title);
+    txt($('#hero-kicker'), s.tagline || '');
     txt($('#hero-sub'), h.hero_subtitle || s.about || '');
 
     var cta = $('#hero-cta');
@@ -465,6 +463,7 @@
     media.appendChild(img);
 
     var badges = el('div', 'badges');
+    if (item.is_new) badges.appendChild(makeNewBadge());
     if (item.badge) badges.appendChild(makeBadge(item.badge));
     if (badges.children.length) media.appendChild(badges);
 
@@ -519,6 +518,13 @@
     });
 
     return card;
+  }
+
+  /** Grünes "Neu" – eigener Schalter, unabhängig vom Aufkleber-Feld. */
+  function makeNewBadge() {
+    var b = el('span', 'badge badge-new');
+    b.textContent = 'Neu';
+    return b;
   }
 
   function makeBadge(text) {
@@ -606,6 +612,7 @@
 
     var badges = $('#lb-badges');
     badges.textContent = '';
+    if (item.is_new) badges.appendChild(makeNewBadge());
     if (item.badge) badges.appendChild(makeBadge(item.badge));
 
     txt($('#lb-desc'), item.description || '');

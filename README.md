@@ -116,8 +116,9 @@ die Reihenfolge auf der Webseite. Pro Objekt:
 | Hauptbild | Vorschaubild in der Galerie. Hochformat wirkt am besten |
 | Titel, Kategorie | Kategorien erzeugen automatisch Filter-Knöpfe und Kachel-Vorschauen |
 | NSFW | Bild unscharf, Kennzeichen neben dem Titel |
+| Neu | Grünes Schild „Neu" oben links auf dem Bild |
 | Highlight | Erscheint zusätzlich oben im Abschnitt „Highlights" |
-| Aufkleber | Farbiges Schild auf dem Bild: Neu, Bestseller, Limitiert, Einzelstück, Auf Anfrage, Nicht verfügbar |
+| Aufkleber | Zweites Schild in der Akzentfarbe: Bestseller, Limitiert, Einzelstück, Auf Anfrage, Nicht verfügbar – kombinierbar mit „Neu" |
 | Material, Maße, Farben, Druckzeit, Verfügbarkeit, Preis-Hinweis | Landen als Tabelle in der Detailansicht |
 | Weitere Bilder | Werden in der Detailansicht als Miniaturen zum Durchblättern gezeigt |
 
@@ -193,9 +194,9 @@ in der Config; auf der Live-Seite wird die Einstellung ignoriert.
 index.html              Aufbau der Seite
 assets/style.css        Design (dunkel als Standard, heller Modus per Umschalter)
 assets/app.js           Lädt die JSON-Dateien und baut daraus die Seite
-assets/logo.webp        Ausweichlogo, falls im CMS keins gesetzt ist
-assets/logo-mark.webp   Ausweich-Symbol für die Kopfzeile
-assets/favicon.png      Browser-Tab-Symbol
+assets/wordmark.webp    Wortmarke (Kopfzeile, Fußzeile, Sperrseite)
+assets/gotham.woff2     Zierschrift für die grossen Überschriften
+assets/favicon.png      Browser-Tab-Symbol (J-Monogramm)
 content/gallery.json    ← vom CMS: deine Objekte
 content/home.json       ← vom CMS: Bühne, Überschriften, Kennzahlen, FAQ
 content/settings.json   ← vom CMS: Titel, Logo, Farbe, Kontakt, Rechtstexte
@@ -276,11 +277,39 @@ Deshalb steht in `admin/index.html`:
 arbeitest du bis zu zehn Minuten mit der alten Fassung weiter und suchst den Fehler an
 der falschen Stelle.
 
+## Die Zierschrift
+
+Die grossen mittigen Überschriften – auf der Bühne und auf der Sperrseite – laufen in
+`assets/gotham.woff2`. Angewendet wird sie über die Variable `--font-display` in
+`assets/style.css`.
+
+> **Diese Schrift kann nur A–Z, a–z und das Leerzeichen.**
+> Ziffern, Umlaute (ä ö ü ß) und Satzzeichen fehlen komplett. Fehlende Zeichen
+> ersetzt der Browser automatisch durch die Systemschrift – das sieht dann gemischt
+> aus. Halte Überschriften also bei reinen Buchstaben. „JazzyBunny Studios" passt,
+> „3D-Druck – individuell" nicht.
+
+Der Untertitel unter der Überschrift und alle übrigen Texte nutzen weiterhin die
+Systemschrift, die alle Zeichen beherrscht.
+
+Die Datei stammt von Vladimir Nikolic und trägt denselben Namen wie die kommerzielle
+Schrift von Hoefler & Co., ist aber nicht dieselbe. Da sie auf der Seite öffentlich
+herunterladbar ist, prüf bei Gelegenheit, ob die Lizenz das erlaubt.
+
 ## Logo austauschen
 
-Die beiden Logo-Dateien liegen als Felder im Admin-Bereich unter **Einstellungen →
-Seite & Kontakt** und lassen sich dort ersetzen. `assets/favicon.png` ist nicht im CMS
-hinterlegt – die Datei einfach direkt im Repository überschreiben (64 × 64 px).
+Es gibt **ein** Logo: die Wortmarke. Sie steht oben links in der Kopfzeile, in der
+Fußzeile und auf der Sperrseite. Austauschbar im Admin unter **Einstellungen →
+Logo (Wortmarke)**.
+
+Format: Querformat mit transparentem Hintergrund, etwa 10:1 breit zu hoch, rund
+900 px breit. Weiße Schrift wird im hellen Design per CSS-Filter dunkel eingefärbt –
+**das klappt nur bei einfarbigen Logos.** Bei einem mehrfarbigen Logo müsste die
+Regel `.brand-logo` in `assets/style.css` angepasst werden.
+
+`assets/favicon.png` ist nicht im CMS hinterlegt – die Datei direkt im Repository
+überschreiben (64 × 64 px) und die Zahl bei `favicon.png?v=2` in `index.html`
+hochzählen.
 
 Die **Akzentfarbe** stellst du im Admin unter **Einstellungen → Akzentfarbe** ein –
 sie färbt Knöpfe, Aufkleber, Kategorie-Labels und die Striche unter den Überschriften.
