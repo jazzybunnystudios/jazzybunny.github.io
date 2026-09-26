@@ -1,40 +1,25 @@
-/* Galerie – lädt die von Decap CMS gepflegten JSON-Dateien und rendert die Seite.
-   Kein Build-Schritt, keine Abhängigkeiten. */
+/* JazzyBunny Studios – liest die vom CMS gepflegten JSON-Dateien und baut daraus
+   die Seite. Kein Build-Schritt, keine Abhängigkeiten, alles im Browser. */
 (function () {
   'use strict';
 
-  // Basis-Pfad der Seite: "/" bei user.github.io, "/repo-name/" bei Projekt-Repos.
+  /* ================= Hilfsmittel ================= */
+
+  // Basis-Pfad der Seite: "/" bei eigener Domain, "/repo/" bei Projekt-Repos.
   var BASE = new URL('.', document.baseURI).pathname;
 
-  /** Bildpfade aus dem CMS ("/images/uploads/x.jpg") auf den Seiten-Basispfad umbiegen. */
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function el(tag, cls) { var n = document.createElement(tag); if (cls) n.className = cls; return n; }
+  function show(node, visible) { if (node) node.hidden = !visible; }
+  function txt(node, value) { if (node) node.textContent = value == null ? '' : String(value); }
+
+  /** Bildpfade aus dem CMS auf den Seiten-Basispfad umbiegen. */
   function mediaUrl(p) {
     if (!p) return '';
     if (/^(https?:)?\/\//.test(p) || p.indexOf('data:') === 0) return p;
     return BASE + String(p).replace(/^\/+/, '');
   }
 
-  function $(sel) { return document.querySelector(sel); }
-  function el(tag, cls) { var n = document.createElement(tag); if (cls) n.className = cls; return n; }
-  function show(node, visible) { if (node) node.hidden = !visible; }
-
-  /* ---------- Theme ---------- */
-  var savedTheme = null;
-  try { savedTheme = localStorage.getItem('theme'); } catch (e) { /* private mode */ }
-  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
-
-  $('#theme-toggle').addEventListener('click', function () {
-    var current = document.documentElement.getAttribute('data-theme');
-    if (!current) {
-      current = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    var next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('theme', next); } catch (e) { /* ignorieren */ }
-  });
-
-  $('#year').textContent = String(new Date().getFullYear());
-
-  /* ---------- Daten laden ---------- */
   function loadJSON(path) {
     return fetch(path, { cache: 'no-cache' }).then(function (r) {
       if (!r.ok) throw new Error(path + ' -> HTTP ' + r.status);
@@ -42,65 +27,65 @@
     });
   }
 
-  // Erst die Einstellungen – daraus ergibt sich, ob die Galerie überhaupt
-  // geladen wird oder die Wartungsansicht kommt.
-  loadJSON('content/settings.json')
-    .catch(function (err) {
-      console.warn('Einstellungen nicht geladen:', err);
-      return {};
-    })
-    .then(function (s) {
-      s = s || {};
-      applySettings(s);
-      document.body.classList.remove('booting');
-
-      if (s.maintenance) {
-        showMaintenance(s);
-        return;
-      }
-      loadGallery();
-    });
-
-  function loadGallery() {
-    loadJSON('content/gallery.json').then(function (data) {
-      show($('#state-loading'), false);
-      var items = (data && Array.isArray(data.items) ? data.items : []).filter(function (it) {
-        return it && it.image;
-      });
-      if (!items.length) { show($('#state-empty'), true); return; }
-      initGallery(items);
-    }).catch(function (err) {
-      console.error(err);
-      show($('#state-loading'), false);
-      show($('#state-error'), true);
-    });
+  function store(key, value) {
+    try {
+      if (value === undefined) return localStorage.getItem(key);
+      localStorage.setItem(key, value);
+    } catch (e) { /* privater Modus – kein Problem */ }
+    return null;
   }
 
-  /* ---------- Wartungsansicht ---------- */
-  function showMaintenance(s) {
-    document.body.classList.add('maintenance-on');
-
-    var heading = s.maintenance_title || 'Wir sind derzeit nicht erreichbar';
-    document.title = (s.title ? s.title + ' – ' : '') + heading;
-    $('#maintenance-title').textContent = heading;
-    $('#maintenance-text').textContent = s.maintenance_text || '';
-
-    var logo = $('#maintenance-logo');
-    if (s.logo) {
-      logo.src = mediaUrl(s.logo);
-      logo.alt = s.title || 'Logo';
-    }
-    if (s.logo === '') show(logo, false);
-
-    // Erreichbar bleiben, auch wenn die Galerie zu ist.
-    buildContactLinks($('#maintenance-contact'), s, false);
-
-    show($('#maintenance'), true);
+  /** Kleiner Markdown-Ersatz für Impressum und Datenschutz. */
+  function miniMarkdown(src) {
+    var escaped = String(src).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return escaped.split(/\n{2,}/).map(function (block) {
+      return '<p>' + block
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" rel="noopener">$1</a>')
+        .replace(/\n/g, '<br>') + '</p>';
+    }).join('');
   }
 
-  /* ---------- Einstellungen anwenden ---------- */
+  /* ================= Design-Umschalter ================= */
+
+  var savedTheme = store('theme');
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
+  $('#theme-toggle').addEventListener('click', function () {
+    var current = document.documentElement.getAttribute('data-theme');
+    if (!current) current = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    store('theme', next);
+  });
+
+  txt($('#year'), new Date().getFullYear());
+
+  /* ================= Start ================= */
+
+  var settings = {};
+  var home = {};
+
+  Promise.all([
+    loadJSON('content/settings.json').catch(function (e) { console.warn('Einstellungen:', e); return {}; }),
+    loadJSON('content/home.json').catch(function () { return {}; })
+  ]).then(function (res) {
+    settings = res[0] || {};
+    home = res[1] || {};
+
+    applySettings(settings);
+    document.body.classList.remove('booting');
+
+    if (settings.maintenance) { showMaintenance(settings); return; }
+
+    applyHome(home, settings);
+    loadGallery();
+  });
+
+  /* ================= Einstellungen ================= */
+
   function applySettings(s) {
-    s = s || {};
+    if (s.accent) document.documentElement.style.setProperty('--accent', s.accent);
 
     if (s.title) {
       document.title = s.title;
@@ -108,57 +93,81 @@
         n.textContent = s.title;
       });
     }
-    if (s.tagline) $('[data-site="tagline"]').textContent = s.tagline;
-    if (s.about) $('[data-site="about"]').textContent = s.about;
+    if (s.tagline) txt($('[data-site="tagline"]'), s.tagline);
 
-    // Logo: im CMS austauschbar. Ohne Logo rückt die Überschrift wieder ins Bild.
-    var heroLogo = $('#hero-logo');
-    if (s.logo) {
-      heroLogo.src = mediaUrl(s.logo);
-      heroLogo.alt = s.title || 'Logo';
-    }
+    setImage($('#hero-logo'), s.logo, s.title);
+    setImage($('#maintenance-logo'), s.logo, s.title);
+    setImage($('#brand-mark'), s.logo_mark || s.logo, '');
+    setImage($('#footer-logo'), s.logo_mark || s.logo, '');
+
     if (s.logo === '') {
-      show(heroLogo, false);
+      show($('#hero-logo'), false);
       $('#hero-title').classList.remove('visually-hidden');
     }
 
-    var mark = $('#brand-mark');
-    if (s.logo_mark) mark.src = mediaUrl(s.logo_mark);
-    if (s.logo_mark === '') show(mark, false);
+    txt($('#footer-about'), s.about || '');
+    txt($('#footer-note'), s.footer_note || '');
 
-    buildContactLinks($('#contact-links'), s, true);
+    buildContactLinks($('#contact-links'), s, true, 'button');
+    buildContactLinks($('#footer-contact'), s, false, 'plain');
 
-    if (s.imprint && String(s.imprint).trim()) {
-      $('#imprint-content').innerHTML = miniMarkdown(String(s.imprint));
-      show($('#imprint-open'), true);
-    }
+    buildAnnounce(s);
+    buildLegal('imprint', s.imprint, 'Impressum');
+    buildLegal('privacy', s.privacy, 'Datenschutz');
   }
 
-  /** Baut die Kontakt-Buttons. withHint blendet bei leeren Daten einen Hinweis ein. */
-  function buildContactLinks(container, s, withHint) {
+  function setImage(node, path, alt) {
+    if (!node || !path) return;
+    node.src = mediaUrl(path);
+    if (alt != null) node.alt = alt;
+  }
+
+  /* ---------- Ankündigungsleiste ---------- */
+  function buildAnnounce(s) {
+    if (!s.announce_on || !String(s.announce_text || '').trim()) return;
+
+    // Einmal weggeklickt bleibt sie weg, bis der Text sich ändert.
+    var key = 'announce:' + s.announce_text;
+    if (store(key) === 'zu') return;
+
+    var link = $('#announce-link');
+    txt(link, s.announce_text);
+    if (s.announce_link) {
+      link.href = s.announce_link;
+      if (/^https?:/.test(s.announce_link)) { link.target = '_blank'; link.rel = 'noopener'; }
+    } else {
+      link.removeAttribute('href');
+    }
+
+    show($('#announce'), true);
+    $('#announce-close').addEventListener('click', function () {
+      show($('#announce'), false);
+      store(key, 'zu');
+    });
+  }
+
+  /* ---------- Kontaktlinks ---------- */
+  function buildContactLinks(container, s, withHint, style) {
+    if (!container) return;
     container.textContent = '';
 
-    if (s.email) {
+    var entries = [];
+    if (s.email) entries.push({ href: 'mailto:' + s.email, label: style === 'plain' ? 'E-Mail' : s.email });
+    if (s.instagram) entries.push({ href: social('instagram.com', s.instagram), label: 'Instagram', ext: true });
+    if (s.tiktok) entries.push({ href: social('tiktok.com/@', s.tiktok, true), label: 'TikTok', ext: true });
+    if (s.youtube) entries.push({ href: social('youtube.com/@', s.youtube, true), label: 'YouTube', ext: true });
+    if (s.etsy) entries.push({ href: social('etsy.com/shop/', s.etsy, true), label: 'Etsy', ext: true });
+    if (s.discord) entries.push({ href: s.discord, label: 'Discord', ext: true });
+    if (s.phone) entries.push({ href: 'tel:' + String(s.phone).replace(/[^\d+]/g, ''), label: s.phone });
+
+    entries.forEach(function (e) {
       var a = el('a');
-      a.href = 'mailto:' + s.email;
-      a.textContent = s.email;
+      a.href = e.href;
+      a.textContent = e.label;
+      if (e.ext) { a.target = '_blank'; a.rel = 'noopener'; }
       container.appendChild(a);
-    }
-    if (s.instagram) {
-      var handle = String(s.instagram).replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/\/$/, '');
-      var ig = el('a');
-      ig.href = 'https://instagram.com/' + handle;
-      ig.rel = 'noopener';
-      ig.target = '_blank';
-      ig.textContent = '@' + handle;
-      container.appendChild(ig);
-    }
-    if (s.phone) {
-      var tel = el('a');
-      tel.href = 'tel:' + String(s.phone).replace(/[^\d+]/g, '');
-      tel.textContent = s.phone;
-      container.appendChild(tel);
-    }
+    });
+
     if (!container.children.length && withHint) {
       var hint = el('p');
       hint.textContent = 'Kontaktdaten können im Admin-Bereich hinterlegt werden.';
@@ -166,22 +175,156 @@
     }
   }
 
-  /** Sehr kleiner Markdown-Renderer für das Impressum (Absätze, Zeilenumbrüche, Fett, Links). */
-  function miniMarkdown(src) {
-    var escaped = src
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    return escaped.split(/\n{2,}/).map(function (block) {
-      var html = block
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" rel="noopener">$1</a>')
-        .replace(/\n/g, '<br>');
-      return '<p>' + html + '</p>';
-    }).join('');
+  /** Nimmt Benutzername oder volle URL entgegen und macht daraus eine Adresse. */
+  function social(domain, value, atPrefixed) {
+    var v = String(value).trim();
+    if (/^https?:\/\//.test(v)) return v;
+    v = v.replace(/^@/, '').replace(/\/$/, '');
+    return 'https://' + (atPrefixed ? domain + v : domain + '/' + v);
   }
 
-  /* ---------- Galerie ---------- */
+  /* ---------- Impressum und Datenschutz ---------- */
+  var legalTexts = {};
+
+  function buildLegal(kind, text, title) {
+    if (!text || !String(text).trim()) return;
+    legalTexts[kind] = { title: title, html: miniMarkdown(text) };
+    var btn = $('#' + kind + '-open');
+    show(btn, true);
+    btn.addEventListener('click', function () { openLegal(kind); });
+  }
+
+  function openLegal(kind) {
+    var entry = legalTexts[kind];
+    if (!entry) return;
+    txt($('#legal-title'), entry.title);
+    $('#legal-content').innerHTML = entry.html;
+    show($('#legal'), true);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLegal() { show($('#legal'), false); document.body.style.overflow = ''; }
+
+  $('#legal').querySelector('.lb-close').addEventListener('click', closeLegal);
+  $('#legal').addEventListener('click', function (e) { if (e.target === $('#legal')) closeLegal(); });
+
+  /* ================= Wartungsansicht ================= */
+
+  function showMaintenance(s) {
+    document.body.classList.add('maintenance-on');
+    var heading = s.maintenance_title || 'Wir sind derzeit nicht erreichbar';
+    document.title = (s.title ? s.title + ' – ' : '') + heading;
+    txt($('#maintenance-title'), heading);
+    txt($('#maintenance-text'), s.maintenance_text || '');
+    if (s.logo === '') show($('#maintenance-logo'), false);
+    buildContactLinks($('#maintenance-contact'), s, false, 'button');
+    show($('#maintenance'), true);
+  }
+
+  /* ================= Startseite ================= */
+
+  function applyHome(h, s) {
+    // Bühne
+    if (h.hero_image) {
+      var bg = $('#hero-bg');
+      bg.style.backgroundImage = 'url("' + mediaUrl(h.hero_image) + '")';
+      show(bg, true);
+      document.body.classList.add('has-hero-bg');
+    }
+    if (h.show_logo === false) {
+      show($('#hero-logo'), false);
+      $('#hero-title').classList.remove('visually-hidden');
+    }
+    if (h.hero_title) {
+      $('#hero-title').classList.remove('visually-hidden');
+      txt($('#hero-title'), h.hero_title);
+    }
+    txt($('#hero-sub'), h.hero_subtitle || s.about || '');
+
+    var cta = $('#hero-cta');
+    if (h.hero_cta_text) txt(cta, h.hero_cta_text);
+    if (h.hero_cta_link) cta.href = h.hero_cta_link;
+
+    // Abschnittstitel
+    if (h.cat_title) txt($('#cat-title'), h.cat_title);
+    if (h.featured_title) txt($('#featured-title'), h.featured_title);
+    if (h.catalog_title) txt($('#catalog-title'), h.catalog_title);
+    if (h.faq_title) txt($('#faq-title'), h.faq_title);
+    if (h.contact_title) txt($('#contact-title'), h.contact_title);
+    if (h.contact_text) txt($('#contact-lead'), h.contact_text);
+
+    renderStats(h.stats);
+    renderFaq(h.faq);
+  }
+
+  function renderStats(stats) {
+    if (!Array.isArray(stats) || !stats.length) return;
+    var box = $('#strip-inner');
+    stats.forEach(function (s) {
+      if (!s || (!s.value && !s.label)) return;
+      var item = el('div', 'strip-item');
+      var b = el('b'); b.textContent = s.value || '';
+      var sp = el('span'); sp.textContent = s.label || '';
+      item.appendChild(b); item.appendChild(sp);
+      box.appendChild(item);
+    });
+    if (box.children.length) show($('#strip'), true);
+  }
+
+  function renderFaq(faq) {
+    if (!Array.isArray(faq) || !faq.length) return;
+    var list = $('#faq-list');
+    faq.forEach(function (f) {
+      if (!f || !f.question) return;
+      var d = el('details', 'faq-item');
+      var sum = el('summary');
+      sum.textContent = f.question;
+      var ans = el('div', 'faq-answer');
+      ans.textContent = f.answer || '';
+      d.appendChild(sum); d.appendChild(ans);
+      list.appendChild(d);
+    });
+    if (list.children.length) {
+      show($('#faq'), true);
+      Array.prototype.forEach.call(document.querySelectorAll('[data-nav="faq"]'), function (n) { n.hidden = false; });
+    }
+  }
+
+  /* ================= Galerie ================= */
+
   var allItems = [];
   var visibleItems = [];
+  var activeCategory = 'Alle';
+  var searchTerm = '';
+  var sortMode = 'default';
+
+  function loadGallery() {
+    loadJSON('content/gallery.json').then(function (data) {
+      show($('#state-loading'), false);
+      allItems = (data && Array.isArray(data.items) ? data.items : []).filter(function (it) {
+        return it && it.image;
+      });
+      if (!allItems.length) { show($('#state-empty'), true); return; }
+
+      buildFilters();
+      renderCategories();
+      renderFeatured();
+      applyView();
+    }).catch(function (err) {
+      console.error(err);
+      show($('#state-loading'), false);
+      show($('#state-error'), true);
+    });
+  }
+
+  function categoriesOf() {
+    var seen = [];
+    allItems.forEach(function (it) {
+      var c = (it.category || '').trim();
+      if (c && seen.indexOf(c) === -1) seen.push(c);
+    });
+    return seen.sort(function (a, b) { return a.localeCompare(b, 'de'); });
+  }
 
   function imagesOf(item) {
     var list = [item.image];
@@ -194,120 +337,222 @@
     return list;
   }
 
-  function initGallery(items) {
-    allItems = items;
-    buildFilters();
-    render(allItems);
-  }
-
+  /* ---------- Filterleiste ---------- */
   function buildFilters() {
-    var cats = [];
-    allItems.forEach(function (it) {
-      var c = (it.category || '').trim();
-      if (c && cats.indexOf(c) === -1) cats.push(c);
-    });
+    var cats = categoriesOf();
     if (cats.length < 2) return;
 
     var bar = $('#filters');
-    cats.sort(function (a, b) { return a.localeCompare(b, 'de'); });
-    ['Alle'].concat(cats).forEach(function (label, i) {
+    ['Alle'].concat(cats).forEach(function (label) {
       var b = el('button', 'chip');
       b.type = 'button';
       b.textContent = label;
-      b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
-      b.addEventListener('click', function () {
-        Array.prototype.forEach.call(bar.children, function (c) { c.setAttribute('aria-pressed', 'false'); });
-        b.setAttribute('aria-pressed', 'true');
-        render(i === 0 ? allItems : allItems.filter(function (it) {
-          return (it.category || '').trim() === label;
-        }));
-      });
+      b.dataset.cat = label;
+      b.setAttribute('aria-pressed', label === 'Alle' ? 'true' : 'false');
+      b.addEventListener('click', function () { setCategory(label); });
       bar.appendChild(b);
     });
     show(bar, true);
   }
 
-  function render(items) {
-    visibleItems = items;
-    var grid = $('#grid');
-    grid.textContent = '';
+  function setCategory(label) {
+    activeCategory = label;
+    Array.prototype.forEach.call($('#filters').children, function (c) {
+      c.setAttribute('aria-pressed', c.dataset.cat === label ? 'true' : 'false');
+    });
+    applyView();
+  }
 
-    items.forEach(function (item, index) {
-      var card = el('button', 'card');
-      card.type = 'button';
+  /* ---------- Kategorie-Kacheln ---------- */
+  function renderCategories() {
+    var cats = categoriesOf();
+    if (cats.length < 2) return;
 
-      var media = el('div', 'card-media');
+    var box = $('#cat-grid');
+    cats.forEach(function (cat) {
+      var members = allItems.filter(function (it) { return (it.category || '').trim() === cat; });
+      var cover = members[0];
+
+      var tile = el('button', 'cat-tile');
+      tile.type = 'button';
+
       var img = el('img');
-      img.src = mediaUrl(item.image);
-      img.alt = item.title || 'Objekt';
+      img.src = mediaUrl(cover.image);
+      img.alt = '';
       img.loading = 'lazy';
-      img.decoding = 'async';
-      media.appendChild(img);
+      tile.appendChild(img);
 
-      if (isHidden(item)) {
-        media.classList.add('is-nsfw');
-        var veil = el('span', 'nsfw-overlay');
-        veil.appendChild(document.createTextNode('NSFW'));
-        var sub = el('small');
-        sub.textContent = 'Zum Anzeigen klicken';
-        veil.appendChild(sub);
-        media.appendChild(veil);
-      }
+      // Verdeckte Objekte sollen auch als Kachelbild nicht offen liegen.
+      if (members.every(function (m) { return m.nsfw; })) tile.classList.add('is-blurred');
 
-      var count = imagesOf(item).length;
-      if (count > 1) {
-        var badge = el('span', 'card-count');
-        badge.textContent = count + ' Bilder';
-        media.appendChild(badge);
-      }
-      card.appendChild(media);
+      var label = el('span', 'cat-label');
+      label.appendChild(document.createTextNode(cat));
+      var count = el('span', 'cat-count');
+      count.textContent = members.length + (members.length === 1 ? ' Objekt' : ' Objekte');
+      label.appendChild(count);
+      tile.appendChild(label);
 
-      var body = el('div', 'card-body');
-      var h3 = el('h3');
-      h3.textContent = item.title || 'Ohne Titel';
-      if (item.nsfw) h3.appendChild(nsfwTag());
-      body.appendChild(h3);
-
-      if (item.description) {
-        var p = el('p');
-        p.textContent = item.description;
-        body.appendChild(p);
-      }
-
-      var tags = el('div', 'card-tags');
-      [item.category, item.material].forEach(function (t) {
-        if (!t) return;
-        var s = el('span', 'tag');
-        s.textContent = t;
-        tags.appendChild(s);
-      });
-      if (tags.children.length) body.appendChild(tags);
-
-      card.appendChild(body);
-
-      // Bei NSFW macht der erste Klick nur scharf – erst der zweite öffnet die
-      // Großansicht. So landet nichts versehentlich formatfüllend am Schirm.
-      card.addEventListener('click', function () {
-        if (isHidden(item)) {
-          revealed.add(item);
-          media.classList.remove('is-nsfw');
-          var v = media.querySelector('.nsfw-overlay');
-          if (v) v.remove();
-          return;
-        }
-        openLightbox(index, 0);
+      tile.addEventListener('click', function () {
+        setCategory(cat);
+        var target = document.getElementById('katalog');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
       });
 
-      grid.appendChild(card);
+      box.appendChild(tile);
+    });
+
+    show($('#kategorien'), true);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-nav="kategorien"]'), function (n) { n.hidden = false; });
+  }
+
+  /* ---------- Highlights ---------- */
+  function renderFeatured() {
+    var picks = allItems.filter(function (it) { return it.featured; });
+    if (!picks.length) return;
+    fillGrid($('#featured-grid'), picks);
+    show($('#highlights'), true);
+  }
+
+  /* ---------- Suche, Filter, Sortierung ---------- */
+  function applyView() {
+    var list = allItems.slice();
+
+    if (activeCategory !== 'Alle') {
+      list = list.filter(function (it) { return (it.category || '').trim() === activeCategory; });
+    }
+
+    if (searchTerm) {
+      var q = searchTerm.toLowerCase();
+      list = list.filter(function (it) {
+        return [it.title, it.description, it.category, it.material, it.colors]
+          .filter(Boolean).join(' ').toLowerCase().indexOf(q) !== -1;
+      });
+    }
+
+    if (sortMode === 'az' || sortMode === 'za') {
+      list.sort(function (a, b) {
+        var r = String(a.title || '').localeCompare(String(b.title || ''), 'de');
+        return sortMode === 'az' ? r : -r;
+      });
+    }
+
+    visibleItems = list;
+    fillGrid($('#grid'), list);
+
+    var n = list.length;
+    txt($('#result-count'), n + (n === 1 ? ' Objekt' : ' Objekte'));
+    show($('#state-nohits'), n === 0);
+  }
+
+  /* ---------- Kachelbau ---------- */
+  function fillGrid(grid, items) {
+    grid.textContent = '';
+    items.forEach(function (item) {
+      grid.appendChild(buildCard(item, items));
     });
   }
 
-  /* ---------- NSFW ---------- */
+  function buildCard(item, list) {
+    var card = el('button', 'card');
+    card.type = 'button';
+
+    var media = el('div', 'card-media');
+    var img = el('img');
+    img.src = mediaUrl(item.image);
+    img.alt = item.title || 'Objekt';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    media.appendChild(img);
+
+    var badges = el('div', 'badges');
+    if (item.badge) badges.appendChild(makeBadge(item.badge));
+    if (badges.children.length) media.appendChild(badges);
+
+    if (isHidden(item)) {
+      media.classList.add('is-nsfw');
+      media.appendChild(makeVeil());
+    }
+
+    var count = imagesOf(item).length;
+    if (count > 1) {
+      var c = el('span', 'card-count');
+      c.textContent = count + ' Bilder';
+      media.appendChild(c);
+    }
+    card.appendChild(media);
+
+    var body = el('div', 'card-body');
+
+    var cat = el('span', 'card-cat');
+    cat.textContent = item.category || '';
+    body.appendChild(cat);
+
+    var h3 = el('h3');
+    h3.textContent = item.title || 'Ohne Titel';
+    if (item.nsfw) h3.appendChild(nsfwTag());
+    body.appendChild(h3);
+
+    if (item.description) {
+      var p = el('p', 'card-desc');
+      p.textContent = item.description;
+      body.appendChild(p);
+    }
+
+    var foot = el('div', 'card-foot');
+    if (item.price_note) {
+      var price = el('span', 'card-price');
+      price.textContent = item.price_note;
+      foot.appendChild(price);
+    }
+    if (item.material) {
+      var meta = el('span', 'card-meta');
+      meta.textContent = item.material;
+      foot.appendChild(meta);
+    }
+    if (foot.children.length) body.appendChild(foot);
+
+    card.appendChild(body);
+
+    card.addEventListener('click', function () {
+      if (isHidden(item)) { reveal(item); return; }
+      openLightbox(list, list.indexOf(item), 0);
+    });
+
+    return card;
+  }
+
+  function makeBadge(text) {
+    var b = el('span', 'badge');
+    if (/nicht verf|ausverkauft|vergeben/i.test(text)) b.className = 'badge badge-muted';
+    else if (/anfrage/i.test(text)) b.className = 'badge badge-outline';
+    b.textContent = text;
+    return b;
+  }
+
+  function makeVeil() {
+    var veil = el('span', 'nsfw-overlay');
+    veil.appendChild(document.createTextNode('NSFW'));
+    var sub = el('small');
+    sub.textContent = 'Zum Anzeigen klicken';
+    veil.appendChild(sub);
+    return veil;
+  }
+
+  /* ================= NSFW ================= */
+
   var revealed = new Set();
 
-  /** true, solange ein als NSFW markiertes Objekt noch verdeckt ist. */
-  function isHidden(item) {
-    return !!item.nsfw && !revealed.has(item);
+  function isHidden(item) { return !!item.nsfw && !revealed.has(item); }
+
+  function reveal(item) {
+    revealed.add(item);
+    applyView();
+    renderFeaturedAgain();
+  }
+
+  function renderFeaturedAgain() {
+    var picks = allItems.filter(function (it) { return it.featured; });
+    if (picks.length) fillGrid($('#featured-grid'), picks);
   }
 
   function nsfwTag() {
@@ -316,14 +561,18 @@
     return t;
   }
 
-  /* ---------- Lightbox ---------- */
+  /* ================= Detailansicht ================= */
+
   var lb = $('#lightbox');
+  var lbList = [];
   var lbIndex = 0;
   var imgIndex = 0;
   var lastFocused = null;
 
-  function openLightbox(itemIdx, imageIdx) {
+  function openLightbox(list, itemIdx, imageIdx) {
+    if (itemIdx < 0) return;
     lastFocused = document.activeElement;
+    lbList = list;
     lbIndex = itemIdx;
     imgIndex = imageIdx || 0;
     show(lb, true);
@@ -339,7 +588,7 @@
   }
 
   function updateLightbox() {
-    var item = visibleItems[lbIndex];
+    var item = lbList[lbIndex];
     if (!item) return;
     var imgs = imagesOf(item);
     if (imgIndex >= imgs.length) imgIndex = 0;
@@ -349,56 +598,93 @@
     img.src = mediaUrl(imgs[imgIndex]);
     img.alt = item.title || 'Objekt';
 
-    // Beim Blättern kann man auf einem noch verdeckten Objekt landen.
     lb.classList.toggle('nsfw-hidden', isHidden(item));
 
-    $('#lb-title').textContent = item.title || 'Ohne Titel';
+    txt($('#lb-cat'), item.category || '');
+    txt($('#lb-title'), item.title || 'Ohne Titel');
     if (item.nsfw) $('#lb-title').appendChild(nsfwTag());
-    $('#lb-meta').textContent = [item.category, item.material].filter(Boolean).join(' · ');
-    $('#lb-desc').textContent = item.description || '';
 
-    var thumbs = $('#lb-thumbs');
-    thumbs.textContent = '';
-    if (imgs.length > 1) {
-      imgs.forEach(function (src, i) {
-        var b = el('button');
-        b.type = 'button';
-        b.setAttribute('aria-current', i === imgIndex ? 'true' : 'false');
-        b.setAttribute('aria-label', 'Bild ' + (i + 1));
-        var t = el('img');
-        t.src = mediaUrl(src);
-        t.alt = '';
-        t.loading = 'lazy';
-        b.appendChild(t);
-        b.addEventListener('click', function () { imgIndex = i; updateLightbox(); });
-        thumbs.appendChild(b);
-      });
-    }
+    var badges = $('#lb-badges');
+    badges.textContent = '';
+    if (item.badge) badges.appendChild(makeBadge(item.badge));
 
-    // Pfeile nur zeigen, wenn es überhaupt etwas zu blättern gibt.
-    var multi = visibleItems.length > 1 || imgs.length > 1;
+    txt($('#lb-desc'), item.description || '');
+    buildSpec(item);
+    buildCta(item);
+    buildThumbs(imgs);
+
+    var multi = lbList.length > 1 || imgs.length > 1;
     show(lb.querySelector('.lb-prev'), multi);
     show(lb.querySelector('.lb-next'), multi);
   }
 
-  /** Blättert innerhalb der Bilder eines Objekts und danach zum nächsten Objekt. */
+  function buildSpec(item) {
+    var dl = $('#lb-spec');
+    dl.textContent = '';
+    [
+      ['Material', item.material],
+      ['Maße', item.size],
+      ['Farben', item.colors],
+      ['Druckzeit', item.print_time],
+      ['Verfügbarkeit', item.status],
+      ['Preis', item.price_note]
+    ].forEach(function (row) {
+      if (!row[1]) return;
+      var dt = el('dt'); dt.textContent = row[0];
+      var dd = el('dd'); dd.textContent = row[1];
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+  }
+
+  function buildCta(item) {
+    var cta = $('#lb-cta');
+    if (settings.email) {
+      cta.href = 'mailto:' + settings.email +
+        '?subject=' + encodeURIComponent('Anfrage: ' + (item.title || 'Objekt'));
+      txt(cta, 'Nach diesem Objekt fragen');
+    } else {
+      cta.href = '#kontakt';
+      txt(cta, 'Zum Kontakt');
+      cta.addEventListener('click', closeLightbox, { once: true });
+    }
+  }
+
+  function buildThumbs(imgs) {
+    var thumbs = $('#lb-thumbs');
+    thumbs.textContent = '';
+    if (imgs.length < 2) return;
+    imgs.forEach(function (src, i) {
+      var b = el('button');
+      b.type = 'button';
+      b.setAttribute('aria-current', i === imgIndex ? 'true' : 'false');
+      b.setAttribute('aria-label', 'Bild ' + (i + 1));
+      var t = el('img');
+      t.src = mediaUrl(src);
+      t.alt = '';
+      t.loading = 'lazy';
+      b.appendChild(t);
+      b.addEventListener('click', function () { imgIndex = i; updateLightbox(); });
+      thumbs.appendChild(b);
+    });
+  }
+
+  /** Blättert durch die Bilder eines Objekts und danach zum nächsten Objekt. */
   function step(dir) {
-    var imgs = imagesOf(visibleItems[lbIndex]);
+    var imgs = imagesOf(lbList[lbIndex]);
     var next = imgIndex + dir;
     if (next >= 0 && next < imgs.length) {
       imgIndex = next;
     } else {
-      lbIndex = (lbIndex + dir + visibleItems.length) % visibleItems.length;
-      imgIndex = dir > 0 ? 0 : imagesOf(visibleItems[lbIndex]).length - 1;
+      lbIndex = (lbIndex + dir + lbList.length) % lbList.length;
+      imgIndex = dir > 0 ? 0 : imagesOf(lbList[lbIndex]).length - 1;
     }
     updateLightbox();
   }
 
   lb.querySelector('.lb-reveal').addEventListener('click', function () {
-    var item = visibleItems[lbIndex];
-    if (item) revealed.add(item);
+    var item = lbList[lbIndex];
+    if (item) reveal(item);
     lb.classList.remove('nsfw-hidden');
-    render(visibleItems); // Kachel im Hintergrund gleich mit aufdecken
   });
 
   lb.querySelector('.lb-close').addEventListener('click', closeLightbox);
@@ -413,10 +699,9 @@
       else if (e.key === 'ArrowRight') step(1);
       return;
     }
-    if (!imprint.hidden && e.key === 'Escape') closeImprint();
+    if (!$('#legal').hidden && e.key === 'Escape') closeLegal();
   });
 
-  // Wischen auf Touch-Geräten
   var touchX = null;
   lb.addEventListener('touchstart', function (e) { touchX = e.changedTouches[0].clientX; }, { passive: true });
   lb.addEventListener('touchend', function (e) {
@@ -426,14 +711,54 @@
     touchX = null;
   }, { passive: true });
 
-  /* ---------- Impressum ---------- */
-  var imprint = $('#imprint');
-  function closeImprint() { show(imprint, false); document.body.style.overflow = ''; }
+  /* ================= Kopfzeile: Menü, Suche, Sortierung ================= */
 
-  $('#imprint-open').addEventListener('click', function () {
-    show(imprint, true);
-    document.body.style.overflow = 'hidden';
+  var navToggle = $('#nav-toggle');
+  navToggle.addEventListener('click', function () {
+    var open = document.body.classList.toggle('nav-open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
-  imprint.querySelector('.lb-close').addEventListener('click', closeImprint);
-  imprint.addEventListener('click', function (e) { if (e.target === imprint) closeImprint(); });
+  $('#main-nav').addEventListener('click', function (e) {
+    if (e.target.tagName === 'A') {
+      document.body.classList.remove('nav-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  var searchToggle = $('#search-toggle');
+  var searchDrawer = $('#search-drawer');
+  var searchInput = $('#search-input');
+
+  searchToggle.addEventListener('click', function () {
+    var open = searchDrawer.hidden;
+    show(searchDrawer, open);
+    searchToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) searchInput.focus();
+  });
+
+  searchInput.addEventListener('input', function () {
+    searchTerm = searchInput.value.trim();
+    show($('#search-clear'), !!searchTerm);
+    applyView();
+  });
+
+  $('#search-clear').addEventListener('click', function () {
+    searchInput.value = '';
+    searchTerm = '';
+    show($('#search-clear'), false);
+    applyView();
+    searchInput.focus();
+  });
+
+  $('#reset-search').addEventListener('click', function () {
+    searchInput.value = '';
+    searchTerm = '';
+    show($('#search-clear'), false);
+    setCategory('Alle');
+  });
+
+  $('#sort-select').addEventListener('change', function (e) {
+    sortMode = e.target.value;
+    applyView();
+  });
 })();

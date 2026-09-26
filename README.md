@@ -104,27 +104,62 @@ zeigt jetzt „Login with GitHub".
 
 ## Benutzung
 
-Unter `/admin/` gibt es zwei Bereiche:
+Unter `/admin/` gibt es drei Bereiche.
 
-**Galerie → Objekte** – die Liste deiner Objekte. „Add Objekt" legt einen neuen Eintrag
-an mit Hauptbild, Titel, Beschreibung, Kategorie, Material und optionalen Zusatzbildern.
-Die Einträge lassen sich per Drag & Drop sortieren; diese Reihenfolge erscheint 1:1 auf
-der Webseite. Aus den Kategorien baut die Seite automatisch Filter-Buttons – ab zwei
-verschiedenen Kategorien tauchen sie auf.
+### Galerie → Objekte
 
-**Einstellungen → Seite & Kontakt** – Titel, Untertitel, Intro-Text, Kontaktdaten und
-Impressum.
+Die Liste deiner Objekte, per Drag & Drop sortierbar – die Reihenfolge hier ist auch
+die Reihenfolge auf der Webseite. Pro Objekt:
+
+| Feld | Wirkung |
+|---|---|
+| Hauptbild | Vorschaubild in der Galerie. Hochformat wirkt am besten |
+| Titel, Kategorie | Kategorien erzeugen automatisch Filter-Knöpfe und Kachel-Vorschauen |
+| NSFW | Bild unscharf, Kennzeichen neben dem Titel |
+| Highlight | Erscheint zusätzlich oben im Abschnitt „Highlights" |
+| Aufkleber | Farbiges Schild auf dem Bild: Neu, Bestseller, Limitiert, Einzelstück, Auf Anfrage, Nicht verfügbar |
+| Material, Maße, Farben, Druckzeit, Verfügbarkeit, Preis-Hinweis | Landen als Tabelle in der Detailansicht |
+| Weitere Bilder | Werden in der Detailansicht als Miniaturen zum Durchblättern gezeigt |
+
+Der Preis-Hinweis ist reiner Text („ab 25 €", „Preis auf Anfrage"). Es gibt keinen
+Warenkorb – Bestellungen laufen über den Kontakt-Knopf, der den Objektnamen in den
+E-Mail-Betreff schreibt.
+
+### Startseite
+
+Bühnenbild, Überschriften, Knöpfe, der Kennzahlen-Streifen und die FAQ-Liste.
+Leere Listen blenden den jeweiligen Abschnitt komplett aus.
+
+### Einstellungen → Seite & Kontakt
+
+Sperre, Ankündigungsleiste, Logos, **Akzentfarbe**, Kontaktdaten (E-Mail, Instagram,
+TikTok, YouTube, Etsy, Discord, Telefon), Impressum und Datenschutz.
 
 Jedes „Publish" ist ein Commit. Nach ein bis zwei Minuten hat GitHub Pages neu
 ausgeliefert und die Änderung ist live.
 
-> **Tipp zu Bildern:** vor dem Hochladen auf etwa 1600 px Breite verkleinern.
+> **Tipp zu Bildern:** vor dem Hochladen auf etwa 1600 px verkleinern.
 > Handy-Fotos mit 8 MB machen die Seite langsam und das Repo unnötig groß.
 
 > **Impressum:** Sobald die Seite gewerblich ist, ist ein Impressum in Deutschland
-> Pflicht. Das Feld ist im Admin-Bereich vorbereitet; solange es leer ist, wird der
-> Link ausgeblendet. Was genau hineingehört, klärst du am besten mit der IHK oder
-> einer Rechtsberatung – ich kann dir das nicht rechtssicher vorgeben.
+> Pflicht. Das Feld ist vorbereitet; solange es leer ist, wird der Link ausgeblendet.
+> Was genau hineingehört, klärst du am besten mit der IHK oder einer Rechtsberatung.
+
+---
+
+## Was Besucher sehen
+
+Ankündigungsleiste (wegklickbar) → klebende Kopfzeile mit Menü, Suche und
+Hell/Dunkel-Umschalter → Bühne mit Logo und Knöpfen → Kennzahlen → Kategorie-Kacheln
+→ Highlights → Galerie mit Filter, Suche und Sortierung → FAQ → Kontakt → Fußzeile.
+
+Abschnitte ohne Inhalt erscheinen gar nicht erst. Mit einem einzigen Objekt ohne
+Kategorie bleibt also nur Bühne, Galerie und Kontakt übrig.
+
+Die **Suche** (Lupe in der Kopfzeile) durchsucht Titel, Beschreibung, Kategorie,
+Material und Farben. Die **Detailansicht** zeigt großes Bild, Miniaturen, Aufkleber,
+Angaben-Tabelle und den Anfrage-Knopf; blättern geht per Pfeiltasten, Wischen oder
+den Knöpfen im Bild.
 
 ---
 
@@ -155,20 +190,24 @@ in der Config; auf der Live-Seite wird die Einstellung ignoriert.
 ## Dateien
 
 ```
-index.html              Startseite
+index.html              Aufbau der Seite
 assets/style.css        Design (dunkel als Standard, heller Modus per Umschalter)
-assets/app.js           Lädt die JSON-Dateien, Grid, Filter, Lightbox
-assets/logo.webp        Volles Logo mit Schriftzug (Startseite)
-assets/logo-mark.webp   Quadratischer Ausschnitt nur mit der Figur (Kopfzeile)
+assets/app.js           Lädt die JSON-Dateien und baut daraus die Seite
+assets/logo.webp        Ausweichlogo, falls im CMS keins gesetzt ist
+assets/logo-mark.webp   Ausweich-Symbol für die Kopfzeile
 assets/favicon.png      Browser-Tab-Symbol
-content/gallery.json    ← wird vom CMS geschrieben: deine Objekte
-content/settings.json   ← wird vom CMS geschrieben: Titel, Logo, Kontakt, Impressum
+content/gallery.json    ← vom CMS: deine Objekte
+content/home.json       ← vom CMS: Bühne, Überschriften, Kennzahlen, FAQ
+content/settings.json   ← vom CMS: Titel, Logo, Farbe, Kontakt, Rechtstexte
 images/uploads/         ← hier landen die hochgeladenen Bilder
 admin/index.html        Lädt Decap CMS
 admin/config.yml        CMS-Konfiguration
 oauth/worker.js         Cloudflare Worker für den GitHub-Login
 .nojekyll               Schaltet Jekyll auf GitHub Pages ab
+CNAME                   Deine Domain – nicht löschen
 ```
+
+Es gibt keinen Build-Schritt: GitHub Pages liefert diese Dateien unverändert aus.
 
 ## Arbeiten am Code, wenn das CMS in Benutzung ist
 
@@ -230,10 +269,10 @@ Config per JavaScript nach – ein normales Neuladen holt sie also nicht zwingen
 Deshalb steht in `admin/index.html`:
 
 ```html
-<link href="config.yml?v=2" type="text/yaml" rel="cms-config-url">
+<link href="config.yml?v=5" type="text/yaml" rel="cms-config-url">
 ```
 
-**Nach jeder Änderung an `config.yml` die Zahl hochzählen** (`?v=3`, `?v=4`, …). Sonst
+**Nach jeder Änderung an `config.yml` die Zahl hochzählen** (`?v=6`, `?v=7`, …). Sonst
 arbeitest du bis zu zehn Minuten mit der alten Fassung weiter und suchst den Fehler an
 der falschen Stelle.
 
@@ -243,8 +282,9 @@ Die beiden Logo-Dateien liegen als Felder im Admin-Bereich unter **Einstellungen
 Seite & Kontakt** und lassen sich dort ersetzen. `assets/favicon.png` ist nicht im CMS
 hinterlegt – die Datei einfach direkt im Repository überschreiben (64 × 64 px).
 
-Die Akzentfarbe stammt aus dem Logo und steht in `assets/style.css` unter `--accent`
-(dunkel: `#c8434b`, hell: `#a52e36`).
+Die **Akzentfarbe** stellst du im Admin unter **Einstellungen → Akzentfarbe** ein –
+sie färbt Knöpfe, Aufkleber, Kategorie-Labels und die Striche unter den Überschriften.
+Der Startwert `#e03a45` steht in `assets/style.css` unter `--accent`.
 
 ## Eigene Domain
 

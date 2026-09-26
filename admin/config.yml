@@ -1,60 +1,74 @@
 # ===================================================================
-#  Decap CMS – Konfiguration
-#  ANPASSEN: die drei mit  <-- ANPASSEN  markierten Zeilen.
+#  Decap CMS – Konfiguration für JazzyBunny Studios
+#
+#  WICHTIG: Nach jeder Änderung an dieser Datei die Versionsnummer in
+#  admin/index.html hochzählen (config.yml?v=5 -> ?v=6). Sonst arbeitet
+#  der Browser bis zu zehn Minuten mit der alten Fassung weiter.
 # ===================================================================
 
 backend:
   name: github
   repo: jazzybunnystudios/jazzybunny.github.io
   branch: main
-  # URL deines Cloudflare Workers (ohne Slash am Ende).
-  # Der Worker übernimmt nur den GitHub-Login – es gibt keine eigene Nutzerdatenbank.
   base_url: https://decap-oauth.jazzybunny.workers.dev
   auth_endpoint: auth
 
-# Lokales Testen: `npx decap-server` starten, dann http://localhost:8080/admin/ öffnen.
-# Wird nur auf localhost verwendet und auf der Live-Seite ignoriert.
+# Lokales Testen: `npx decap-server` starten, dann localhost öffnen.
+# Auf der Live-Seite wird diese Einstellung ignoriert.
 local_backend: true
 
 locale: de
 
-media_folder: "images/uploads"     # Speicherort der Bilder im Repo
-public_folder: "/images/uploads"   # Pfad, der in den JSON-Dateien landet
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
 
 site_url: https://jazzybunny-studios.com
 display_url: https://jazzybunny-studios.com
 show_preview_links: false
 
 collections:
+  # =================================================================
+  #  1. Objekte
+  # =================================================================
   - name: gallery
     label: Galerie
     label_singular: Galerie
     delete: false
+    editor:
+      preview: false
     files:
       - name: items
         label: Objekte
         file: content/gallery.json
         format: json
         description: >-
-          Bilder und Beschreibungen deiner Objekte. Einträge lassen sich per
-          Drag & Drop sortieren – die Reihenfolge hier ist die Reihenfolge
-          auf der Webseite.
+          Deine Objekte. Per Drag & Drop sortierbar – die Reihenfolge hier ist
+          auch die Reihenfolge auf der Webseite.
         fields:
           - label: Objekte
             name: items
             widget: list
             label_singular: Objekt
             collapsed: true
-            summary: "{{fields.title}}"
+            summary: "{{fields.title}}  ·  {{fields.category}}"
             fields:
               - label: Hauptbild
                 name: image
                 widget: image
-                hint: Wird als Vorschaubild in der Galerie angezeigt.
+                hint: Wird als Vorschaubild in der Galerie angezeigt. Hochformat wirkt am besten.
 
               - label: Titel
                 name: title
                 widget: string
+
+              - label: Kategorie
+                name: category
+                widget: string
+                required: false
+                hint: >-
+                  z. B. "Figuren", "Deko", "Ersatzteile". Aus den Kategorien
+                  entstehen automatisch die Filter-Knöpfe und die
+                  Kategorie-Kacheln auf der Startseite.
 
               - label: NSFW
                 name: nsfw
@@ -62,28 +76,72 @@ collections:
                 default: false
                 required: false
                 hint: >-
-                  An = Bild wird in der Galerie unscharf angezeigt und
-                  bekommt ein NSFW-Kennzeichen neben dem Titel. Besucher
-                  decken es mit einem Klick selbst auf.
+                  An = Bild wird unscharf angezeigt, mit NSFW-Kennzeichen
+                  neben dem Titel. Besucher decken es selbst auf.
+
+              - label: Highlight auf der Startseite
+                name: featured
+                widget: boolean
+                default: false
+                required: false
+                hint: An = erscheint zusätzlich oben im Abschnitt "Highlights".
+
+              - label: Aufkleber
+                name: badge
+                widget: select
+                required: false
+                options:
+                  - Neu
+                  - Bestseller
+                  - Limitiert
+                  - Einzelstück
+                  - Auf Anfrage
+                  - Nicht verfügbar
+                hint: Kleines farbiges Schild oben links auf dem Bild. Leer lassen = keins.
 
               - label: Beschreibung
                 name: description
                 widget: text
                 required: false
 
-              - label: Kategorie
-                name: category
-                widget: string
-                required: false
-                hint: >-
-                  z. B. "Deko", "Ersatzteile", "Figuren". Aus den Kategorien
-                  werden automatisch Filter-Buttons auf der Seite erzeugt.
-
+              # --- Angaben für die Detailansicht ---
               - label: Material
                 name: material
                 widget: string
                 required: false
                 hint: 'z. B. "PLA", "PETG", "Resin"'
+
+              - label: Maße
+                name: size
+                widget: string
+                required: false
+                hint: 'z. B. "12 × 8 × 20 cm"'
+
+              - label: Farben
+                name: colors
+                widget: string
+                required: false
+                hint: 'z. B. "Schwarz, Rot, Weiß" – frei wählbar'
+
+              - label: Druckzeit
+                name: print_time
+                widget: string
+                required: false
+                hint: 'z. B. "ca. 14 Stunden"'
+
+              - label: Verfügbarkeit
+                name: status
+                widget: string
+                required: false
+                hint: 'z. B. "Auf Lager", "Fertigung 3–5 Tage", "Nur auf Bestellung"'
+
+              - label: Preis-Hinweis
+                name: price_note
+                widget: string
+                required: false
+                hint: >-
+                  Reine Textangabe, z. B. "ab 25 €" oder "Preis auf Anfrage".
+                  Es gibt keinen Warenkorb – Bestellungen laufen über den Kontakt.
 
               - label: Weitere Bilder
                 name: gallery
@@ -96,25 +154,157 @@ collections:
                     name: image
                     widget: image
 
+  # =================================================================
+  #  2. Startseite
+  # =================================================================
+  - name: home
+    label: Startseite
+    delete: false
+    editor:
+      preview: false
+    files:
+      - name: page
+        label: Aufbau der Startseite
+        file: content/home.json
+        format: json
+        description: Bühne, Abschnittsüberschriften, Kennzahlen und FAQ.
+        fields:
+          # --- Bühne ---
+          - label: Hintergrundbild der Bühne
+            name: hero_image
+            widget: image
+            required: false
+            hint: >-
+              Großes Bild hinter dem Logo ganz oben. Wird automatisch
+              abgedunkelt, damit Schrift lesbar bleibt. Leer lassen = schlicht.
+
+          - label: Logo auf der Startseite zeigen
+            name: show_logo
+            widget: boolean
+            default: true
+            required: false
+
+          - label: Überschrift
+            name: hero_title
+            widget: string
+            required: false
+            hint: Leer lassen, wenn nur das Logo stehen soll.
+
+          - label: Unterzeile
+            name: hero_subtitle
+            widget: text
+            required: false
+            hint: Leer lassen übernimmt den Text aus Einstellungen → "Über dich".
+
+          - label: Knopf-Beschriftung
+            name: hero_cta_text
+            widget: string
+            required: false
+            default: Zur Galerie
+
+          - label: Knopf-Ziel
+            name: hero_cta_link
+            widget: string
+            required: false
+            default: "#katalog"
+            hint: '"#katalog", "#kontakt" oder eine volle Adresse.'
+
+          # --- Kennzahlen ---
+          - label: Kennzahlen-Streifen
+            name: stats
+            widget: list
+            required: false
+            collapsed: true
+            label_singular: Kennzahl
+            summary: "{{fields.value}} – {{fields.label}}"
+            hint: >-
+              Schmaler Balken unter der Bühne, z. B. "120 · Objekte gedruckt".
+              Leer lassen blendet ihn aus.
+            fields:
+              - label: Zahl
+                name: value
+                widget: string
+              - label: Beschriftung
+                name: label
+                widget: string
+
+          # --- Überschriften ---
+          - label: Überschrift "Kategorien"
+            name: cat_title
+            widget: string
+            required: false
+            default: Kategorien
+
+          - label: Überschrift "Highlights"
+            name: featured_title
+            widget: string
+            required: false
+            default: Highlights
+
+          - label: Überschrift "Galerie"
+            name: catalog_title
+            widget: string
+            required: false
+            default: Galerie
+
+          # --- FAQ ---
+          - label: Überschrift "FAQ"
+            name: faq_title
+            widget: string
+            required: false
+            default: Häufige Fragen
+
+          - label: Häufige Fragen
+            name: faq
+            widget: list
+            required: false
+            collapsed: true
+            label_singular: Frage
+            summary: "{{fields.question}}"
+            hint: Leer lassen blendet den ganzen FAQ-Abschnitt aus.
+            fields:
+              - label: Frage
+                name: question
+                widget: string
+              - label: Antwort
+                name: answer
+                widget: text
+
+          # --- Kontaktabschnitt ---
+          - label: Überschrift "Kontakt"
+            name: contact_title
+            widget: string
+            required: false
+            default: Kontakt
+
+          - label: Text im Kontaktabschnitt
+            name: contact_text
+            widget: text
+            required: false
+
+  # =================================================================
+  #  3. Einstellungen
+  # =================================================================
   - name: settings
     label: Einstellungen
     delete: false
+    editor:
+      preview: false
     files:
       - name: site
         label: Seite & Kontakt
         file: content/settings.json
         format: json
         fields:
+          # --- Sperre ---
           - label: Seite gesperrt
             name: maintenance
             widget: boolean
             default: false
             hint: >-
               An = Besucher sehen statt der Galerie einen Hinweis. Der
-              Admin-Bereich bleibt erreichbar, du kommst also jederzeit
-              wieder rein. Achtung: das ist ein Hinweisschild, keine
-              Zugangssperre – direkt aufgerufene Bilddateien bleiben
-              abrufbar.
+              Admin-Bereich bleibt erreichbar. Achtung: Hinweisschild, keine
+              Zugangssperre – direkt aufgerufene Bilddateien bleiben abrufbar.
 
           - label: Text bei gesperrter Seite
             name: maintenance_title
@@ -126,8 +316,27 @@ collections:
             name: maintenance_text
             widget: text
             required: false
-            hint: Optional, z. B. wann es weitergeht.
 
+          # --- Ankündigungsleiste ---
+          - label: Ankündigungsleiste anzeigen
+            name: announce_on
+            widget: boolean
+            default: false
+            required: false
+            hint: Farbiger Balken ganz oben, z. B. für Aktionen oder Urlaubszeiten.
+
+          - label: Text der Ankündigung
+            name: announce_text
+            widget: string
+            required: false
+
+          - label: Ziel der Ankündigung
+            name: announce_link
+            widget: string
+            required: false
+            hint: Optional. Macht den Balken anklickbar, z. B. "#katalog".
+
+          # --- Identität ---
           - label: Seitentitel
             name: title
             widget: string
@@ -136,43 +345,76 @@ collections:
             name: tagline
             widget: string
             required: false
+            hint: Kleine Zeile unter dem Namen in der Kopfzeile.
 
-          - label: Intro-Text
+          - label: Über dich
             name: about
             widget: text
             required: false
-            hint: Der Text unter dem Logo auf der Startseite.
+            hint: Erscheint auf der Bühne und in der Fußzeile.
 
           - label: Logo (groß)
             name: logo
             widget: image
             required: false
-            hint: >-
-              Das große Logo auf der Startseite. Enthält bereits den Schriftzug.
-              Leer lassen zeigt stattdessen den Seitentitel als Text.
+            hint: Enthält bereits den Schriftzug. Leer lassen zeigt stattdessen den Titel als Text.
 
           - label: Logo-Symbol (quadratisch)
             name: logo_mark
             widget: image
             required: false
-            hint: Kleines quadratisches Logo für die Kopfzeile.
+            hint: Kleines Logo für Kopf- und Fußzeile.
 
+          - label: Akzentfarbe
+            name: accent
+            widget: color
+            required: false
+            default: "#e03a45"
+            allowInput: true
+            hint: Farbe für Knöpfe, Aufkleber und Überschriften-Striche.
+
+          # --- Kontakt ---
           - label: E-Mail
             name: email
             widget: string
             required: false
+            hint: >-
+              Wird auch für den Knopf "Nach diesem Objekt fragen" in der
+              Detailansicht verwendet – der Objektname landet im Betreff.
 
           - label: Instagram
             name: instagram
             widget: string
             required: false
-            hint: Nur der Benutzername, z. B. meinprofil
+            hint: Benutzername oder volle Adresse.
+
+          - label: TikTok
+            name: tiktok
+            widget: string
+            required: false
+
+          - label: YouTube
+            name: youtube
+            widget: string
+            required: false
+
+          - label: Etsy-Shop
+            name: etsy
+            widget: string
+            required: false
+
+          - label: Discord-Einladung
+            name: discord
+            widget: string
+            required: false
+            hint: Volle Einladungs-Adresse.
 
           - label: Telefon
             name: phone
             widget: string
             required: false
 
+          # --- Rechtliches ---
           - label: Impressum
             name: imprint
             widget: text
@@ -180,3 +422,15 @@ collections:
             hint: >-
               In Deutschland für gewerbliche Seiten Pflicht (§ 5 DDG):
               Name, Anschrift, E-Mail. Leer lassen blendet den Link aus.
+
+          - label: Datenschutzerklärung
+            name: privacy
+            widget: text
+            required: false
+            hint: Leer lassen blendet den Link aus.
+
+          - label: Zusatz in der Fußzeile
+            name: footer_note
+            widget: string
+            required: false
+            hint: 'Optional, z. B. "Handgefertigt in Deutschland".'

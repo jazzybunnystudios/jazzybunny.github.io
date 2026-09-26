@@ -4,54 +4,135 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JazzyBunny Studios</title>
-<meta name="description" content="JazzyBunny Studios – Galerie für 3D-Druck Objekte">
-<meta name="theme-color" content="#09090d">
-<link rel="stylesheet" href="assets/style.css">
+<meta name="description" content="JazzyBunny Studios – Galerie für individuelle 3D-Druck Objekte">
+<meta name="theme-color" content="#08080b">
+<meta property="og:type" content="website">
+<meta property="og:title" content="JazzyBunny Studios">
+<meta property="og:description" content="Galerie für individuelle 3D-Druck Objekte">
+<link rel="stylesheet" href="assets/style.css?v=2">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body class="booting">
 
-<!-- Wartungsansicht: wird nur gezeigt, wenn im Admin "Seite gesperrt" aktiv ist. -->
+<!-- Wartungsansicht: nur sichtbar, wenn im Admin "Seite gesperrt" aktiv ist -->
 <section id="maintenance" class="maintenance" hidden>
   <div class="wrap">
-    <img class="maintenance-logo" id="maintenance-logo" src="assets/logo.webp" alt="JazzyBunny Studios" width="860" height="860">
+    <img class="maintenance-logo" id="maintenance-logo" src="assets/logo.webp" alt="JazzyBunny Studios">
     <h1 id="maintenance-title">Wir sind derzeit nicht erreichbar</h1>
     <p id="maintenance-text"></p>
     <div id="maintenance-contact" class="contact-links"></div>
   </div>
 </section>
 
+<!-- Ankündigungsleiste -->
+<div id="announce" class="announce" hidden>
+  <div class="wrap announce-inner">
+    <a id="announce-link" class="announce-text" href="#"></a>
+    <button type="button" id="announce-close" class="announce-close" aria-label="Hinweis schließen">&times;</button>
+  </div>
+</div>
+
 <header class="site-header">
   <div class="wrap header-inner">
-    <a class="brand" href="./">
-      <img class="brand-mark" id="brand-mark" src="assets/logo-mark.webp" alt="" width="38" height="38">
+    <button type="button" id="nav-toggle" class="icon-btn nav-toggle" aria-label="Menü" aria-expanded="false">
+      <span class="burger" aria-hidden="true"></span>
+    </button>
+
+    <a class="brand" href="#top">
+      <img class="brand-mark" id="brand-mark" src="assets/logo-mark.webp" alt="" width="40" height="40">
       <span class="brand-text">
         <strong data-site="title">JazzyBunny Studios</strong>
         <small data-site="tagline"></small>
       </span>
     </a>
-    <nav class="header-nav">
-      <a href="#galerie">Galerie</a>
+
+    <nav class="main-nav" id="main-nav">
+      <a href="#katalog">Galerie</a>
+      <a href="#kategorien" data-nav="kategorien" hidden>Kategorien</a>
+      <a href="#faq" data-nav="faq" hidden>FAQ</a>
       <a href="#kontakt">Kontakt</a>
-      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Design wechseln" title="Hell / Dunkel">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path class="ico-sun" d="M12 4V2m0 20v-2m8-8h2M2 12h2m13.66-5.66l1.41-1.41M4.93 19.07l1.41-1.41m0-11.32L4.93 4.93m14.14 14.14l-1.41-1.41M12 8a4 4 0 100 8 4 4 0 000-8z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="ico-moon" d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-      </button>
     </nav>
+
+    <div class="header-actions">
+      <button type="button" id="search-toggle" class="icon-btn" aria-label="Suche" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+        </svg>
+      </button>
+      <button type="button" id="theme-toggle" class="icon-btn" aria-label="Hell oder dunkel">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path class="ico-sun" d="M12 4V2m0 20v-2m8-8h2M2 12h2m13.66-5.66l1.41-1.41M4.93 19.07l1.41-1.41m0-11.32L4.93 4.93m14.14 14.14l-1.41-1.41M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          <path class="ico-moon" d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="search-drawer" id="search-drawer" hidden>
+    <div class="wrap search-inner">
+      <input type="search" id="search-input" placeholder="Objekt, Kategorie oder Material suchen …" autocomplete="off">
+      <button type="button" id="search-clear" class="linklike" hidden>Zurücksetzen</button>
+    </div>
   </div>
 </header>
 
-<main>
-  <section class="hero">
-    <div class="wrap">
-      <img class="hero-logo" id="hero-logo" src="assets/logo.webp" alt="JazzyBunny Studios" width="860" height="860" fetchpriority="high">
+<main id="top">
+
+  <!-- Bühne -->
+  <section class="hero" id="hero">
+    <div class="hero-bg" id="hero-bg" hidden></div>
+    <div class="wrap hero-inner">
+      <img class="hero-logo" id="hero-logo" src="assets/logo.webp" alt="JazzyBunny Studios">
       <h1 id="hero-title" class="visually-hidden" data-site="title">JazzyBunny Studios</h1>
-      <p class="hero-text" data-site="about"></p>
+      <p class="hero-sub" id="hero-sub"></p>
+      <div class="hero-actions" id="hero-actions">
+        <a class="btn btn-primary" id="hero-cta" href="#katalog">Zur Galerie</a>
+        <a class="btn btn-ghost" href="#kontakt">Anfrage stellen</a>
+      </div>
     </div>
   </section>
 
-  <section id="galerie" class="gallery-section">
+  <!-- Kennzahlen -->
+  <section class="strip" id="strip" hidden>
+    <div class="wrap strip-inner" id="strip-inner"></div>
+  </section>
+
+  <!-- Kategorien -->
+  <section class="section" id="kategorien" hidden>
     <div class="wrap">
-      <div id="filters" class="filters" role="group" aria-label="Nach Kategorie filtern" hidden></div>
+      <h2 class="section-title" id="cat-title">Kategorien</h2>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+  </section>
+
+  <!-- Highlights -->
+  <section class="section section-alt" id="highlights" hidden>
+    <div class="wrap">
+      <h2 class="section-title" id="featured-title">Highlights</h2>
+      <div class="grid" id="featured-grid"></div>
+    </div>
+  </section>
+
+  <!-- Katalog -->
+  <section class="section" id="katalog">
+    <div class="wrap">
+      <h2 class="section-title" id="catalog-title">Galerie</h2>
+
+      <div class="catalog-bar">
+        <div id="filters" class="filters" role="group" aria-label="Nach Kategorie filtern" hidden></div>
+        <div class="catalog-tools">
+          <span class="result-count" id="result-count"></span>
+          <label class="sort">
+            <span class="visually-hidden">Sortierung</span>
+            <select id="sort-select">
+              <option value="default">Empfohlen</option>
+              <option value="az">Name A–Z</option>
+              <option value="za">Name Z–A</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
       <div id="grid" class="grid" aria-live="polite"></div>
 
       <div id="state-loading" class="state">
@@ -60,65 +141,106 @@
       </div>
 
       <div id="state-empty" class="state" hidden>
-        <h2>Noch keine Objekte</h2>
+        <h3>Noch keine Objekte</h3>
         <p>Melde dich im Admin-Bereich an und lade dein erstes Bild hoch.</p>
-        <a class="btn" href="admin/">Zum Admin-Bereich</a>
+        <a class="btn btn-primary" href="admin/">Zum Admin-Bereich</a>
+      </div>
+
+      <div id="state-nohits" class="state" hidden>
+        <h3>Nichts gefunden</h3>
+        <p>Für diese Suche gibt es kein passendes Objekt.</p>
+        <button type="button" class="btn btn-ghost" id="reset-search">Filter zurücksetzen</button>
       </div>
 
       <div id="state-error" class="state" hidden>
-        <h2>Galerie konnte nicht geladen werden</h2>
+        <h3>Galerie konnte nicht geladen werden</h3>
         <p><code>content/gallery.json</code> ist nicht erreichbar oder fehlerhaft.</p>
       </div>
     </div>
   </section>
 
-  <section id="kontakt" class="contact">
-    <div class="wrap">
-      <h2>Kontakt</h2>
-      <p>Interesse an einem Objekt oder einer eigenen Idee? Schreib mir gerne.</p>
+  <!-- FAQ -->
+  <section class="section section-alt" id="faq" hidden>
+    <div class="wrap wrap-narrow">
+      <h2 class="section-title" id="faq-title">Häufige Fragen</h2>
+      <div class="faq-list" id="faq-list"></div>
+    </div>
+  </section>
+
+  <!-- Kontakt -->
+  <section class="section contact" id="kontakt">
+    <div class="wrap wrap-narrow">
+      <h2 class="section-title" id="contact-title">Kontakt</h2>
+      <p class="contact-lead" id="contact-lead">Interesse an einem Objekt oder einer eigenen Idee? Schreib mir gerne.</p>
       <div id="contact-links" class="contact-links"></div>
     </div>
   </section>
 </main>
 
 <footer class="site-footer">
-  <div class="wrap footer-inner">
-    <span>&copy; <span id="year"></span> <span data-site="title">Galerie</span></span>
-    <span class="footer-links">
+  <div class="wrap footer-grid">
+    <div class="footer-col footer-brand">
+      <img class="footer-logo" id="footer-logo" src="assets/logo-mark.webp" alt="" width="52" height="52">
+      <p class="footer-about" id="footer-about"></p>
+    </div>
+    <div class="footer-col">
+      <h4>Entdecken</h4>
+      <a href="#katalog">Galerie</a>
+      <a href="#kategorien" data-nav="kategorien" hidden>Kategorien</a>
+      <a href="#faq" data-nav="faq" hidden>FAQ</a>
+    </div>
+    <div class="footer-col">
+      <h4>Kontakt</h4>
+      <div id="footer-contact" class="footer-links-col"></div>
+    </div>
+    <div class="footer-col">
+      <h4>Rechtliches</h4>
       <button type="button" class="linklike" id="imprint-open" hidden>Impressum</button>
+      <button type="button" class="linklike" id="privacy-open" hidden>Datenschutz</button>
       <a href="admin/">Admin</a>
-    </span>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>&copy; <span id="year"></span> <span data-site="title">JazzyBunny Studios</span></span>
+    <span id="footer-note"></span>
   </div>
 </footer>
 
-<!-- Lightbox -->
-<div id="lightbox" class="lightbox" hidden role="dialog" aria-modal="true" aria-label="Bildansicht">
-  <button class="lb-close icon-btn" type="button" aria-label="Schließen">&times;</button>
-  <button class="lb-nav lb-prev icon-btn" type="button" aria-label="Vorheriges Bild">&#8249;</button>
-  <button class="lb-nav lb-next icon-btn" type="button" aria-label="Nächstes Bild">&#8250;</button>
-  <figure class="lb-figure">
-    <img id="lb-img" alt="">
-    <button type="button" class="lb-reveal" id="lb-reveal">
-      NSFW<small>Zum Anzeigen klicken</small>
-    </button>
-    <figcaption class="lb-caption">
-      <h3 id="lb-title"></h3>
-      <p id="lb-meta" class="lb-meta"></p>
-      <p id="lb-desc"></p>
-      <div id="lb-thumbs" class="lb-thumbs"></div>
-    </figcaption>
-  </figure>
-</div>
+<!-- Detailansicht -->
+<div id="lightbox" class="lightbox" hidden role="dialog" aria-modal="true" aria-label="Objektansicht">
+  <div class="lb-shell">
+    <button class="lb-close icon-btn" type="button" aria-label="Schließen">&times;</button>
 
-<!-- Impressum -->
-<div id="imprint" class="lightbox imprint-modal" hidden role="dialog" aria-modal="true" aria-label="Impressum">
-  <button class="lb-close icon-btn" type="button" aria-label="Schließen">&times;</button>
-  <div class="imprint-body">
-    <h2>Impressum</h2>
-    <div id="imprint-content"></div>
+    <div class="lb-media">
+      <div class="lb-stage">
+        <img id="lb-img" alt="">
+        <button type="button" class="lb-reveal" id="lb-reveal">NSFW<small>Zum Anzeigen klicken</small></button>
+        <button class="lb-nav lb-prev icon-btn" type="button" aria-label="Vorheriges Objekt">&#8249;</button>
+        <button class="lb-nav lb-next icon-btn" type="button" aria-label="Nächstes Objekt">&#8250;</button>
+      </div>
+      <div id="lb-thumbs" class="lb-thumbs"></div>
+    </div>
+
+    <div class="lb-info">
+      <span class="lb-cat" id="lb-cat"></span>
+      <h3 id="lb-title"></h3>
+      <div class="badges" id="lb-badges"></div>
+      <p id="lb-desc"></p>
+      <dl class="spec" id="lb-spec"></dl>
+      <a class="btn btn-primary lb-cta" id="lb-cta" href="#kontakt">Nach diesem Objekt fragen</a>
+    </div>
   </div>
 </div>
 
-<script src="assets/app.js"></script>
+<!-- Rechtstexte -->
+<div id="legal" class="lightbox legal-modal" hidden role="dialog" aria-modal="true" aria-label="Rechtstext">
+  <button class="lb-close icon-btn" type="button" aria-label="Schließen">&times;</button>
+  <div class="legal-body">
+    <h2 id="legal-title"></h2>
+    <div id="legal-content"></div>
+  </div>
+</div>
+
+<script src="assets/app.js?v=2"></script>
 </body>
 </html>
