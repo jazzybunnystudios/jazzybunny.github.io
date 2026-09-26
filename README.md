@@ -296,11 +296,15 @@ nichts aus.
 Trägst du versehentlich einen Einladungslink (`discord.gg/…`) ein, findet sich darin
 keine Server-ID – dann erscheint statt des Widgets ein schlichter Knopf zum Server.
 
-**Zum Datenschutz:** Das Widget lädt erst, wenn Besucher auf *Widget laden* klicken.
-Vorher geht keine Anfrage an Discord. Das ist Absicht – ein automatisch geladenes
-Fremd-Widget überträgt die IP-Adresse deiner Besucher an Discord, was in Deutschland
-ohne Einwilligung heikel ist. Sobald du das Widget nutzt, gehört Discord als
-Empfänger in deine Datenschutzerklärung.
+Das Widget lädt automatisch mit der Seite. Weil der Kontaktbereich ganz unten liegt,
+trägt der Rahmen `loading="lazy"` – der Browser holt den Inhalt erst, wenn der
+Abschnitt in die Nähe des Sichtbereichs kommt. Der Seitenaufbau wird dadurch nicht
+ausgebremst, und `.discord-box` reserviert vorab 460 px Höhe, damit nichts springt.
+
+**Zum Datenschutz:** Damit geht bei praktisch jedem Besuch eine Anfrage an Discord,
+inklusive der IP-Adresse des Besuchers. Discord gehört deshalb als Empfänger in deine
+Datenschutzerklärung. Wenn du stattdessen lieber ein Klick-Tor davor hättest – also
+erst ein Knopf, dann das Widget – sag Bescheid, das ist schnell wieder eingebaut.
 
 ## Die Zierschrift
 

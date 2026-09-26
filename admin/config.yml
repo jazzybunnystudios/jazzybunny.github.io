@@ -420,8 +420,10 @@ collections:
               mir die Nummer selbst heraus. Den Code findest du in Discord
               unter Servereinstellungen → Widget; dort muss "Server-Widget
               aktivieren" eingeschaltet sein, sonst bleibt es leer.
-              Aus Datenschutzgründen lädt das Widget erst, wenn Besucher
-              darauf klicken. Leer lassen blendet es aus.
+              Beachte: Das Widget lädt bei jedem Seitenaufruf mit und
+              übermittelt dabei die IP-Adresse der Besucher an Discord –
+              Discord gehört deshalb in deine Datenschutzerklärung.
+              Leer lassen blendet es aus.
 
           - label: Telefon
             name: phone

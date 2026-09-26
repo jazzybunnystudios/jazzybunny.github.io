@@ -159,14 +159,10 @@
     }
 
     show($('#discord-box'), true);
-    $('#discord-load').addEventListener('click', loadDiscord);
-
-    // Wer schon zugestimmt hat, bekommt es beim Blättern direkt zu sehen.
-    if (store('discord') === 'ja') loadDiscord();
+    loadDiscord();
   }
 
   function loadDiscord() {
-    store('discord', 'ja');
     var frame = el('iframe', 'discord-frame');
     frame.id = 'discord-frame';
     frame.title = 'Discord-Server';
