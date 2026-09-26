@@ -1,14 +1,25 @@
 {
   "items": [
     {
-      "nsfw": false,
-      "featured": false,
-      "image": "/images/uploads/bild_2026-08-02_180623977.png",
-      "title": "Placeholder",
-      "category": "Placeholder",
+      "size": "Placeholder",
       "badge": "Auf Anfrage",
+      "material": "Placeholder",
+      "price_note": "Placeholder",
+      "featured": false,
+      "colors": "Placeholder",
+      "status": "Placeholder",
+      "nsfw": false,
+      "title": "Placeholder",
+      "image": "/images/uploads/bild_2026-08-02_180623977.png",
       "description": "Placeholder",
-      "price_note": "20 Euro"
+      "category": "Placeholder",
+      "print_time": "Placeholder"
+    },
+    {
+      "nsfw": true,
+      "featured": true,
+      "image": "/images/uploads/bild_2026-08-02_180623977.png",
+      "title": "Placeholder"
     }
   ]
 }
