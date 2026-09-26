@@ -133,8 +133,8 @@ Leere Listen blenden den jeweiligen Abschnitt komplett aus.
 
 ### Einstellungen → Seite & Kontakt
 
-Sperre, Ankündigungsleiste, Logos, **Akzentfarbe**, Kontaktdaten (E-Mail, Instagram,
-TikTok, YouTube, Etsy, Discord, Telefon), Impressum und Datenschutz.
+Sperre, Ankündigungsleiste, Logo, **Akzentfarbe**, Kontaktdaten (E-Mail, Instagram,
+TikTok, YouTube, Etsy, Telefon), das **Discord-Widget**, Impressum und Datenschutz.
 
 Jedes „Publish" ist ein Commit. Nach ein bis zwei Minuten hat GitHub Pages neu
 ausgeliefert und die Änderung ist live.
@@ -276,6 +276,31 @@ Deshalb steht in `admin/index.html`:
 **Nach jeder Änderung an `config.yml` die Zahl hochzählen** (`?v=6`, `?v=7`, …). Sonst
 arbeitest du bis zu zehn Minuten mit der alten Fassung weiter und suchst den Fehler an
 der falschen Stelle.
+
+## Discord-Widget
+
+Das Feld **Einstellungen → Discord-Widget** zeigt deinen Server unten im
+Kontaktbereich, mit Mitgliederliste und Beitreten-Knopf.
+
+Hineinschreiben kannst du, was dir am nächsten liegt – die Seite holt sich die
+Server-ID selbst heraus:
+
+* den kompletten Einbettungscode aus Discord
+* die Widget-Adresse (`https://discord.com/widget?id=...`)
+* oder einfach nur die Server-ID
+
+Damit überhaupt etwas erscheint, muss in Discord unter **Servereinstellungen →
+Widget** der Schalter *Server-Widget aktivieren* an sein. Ohne das liefert Discord
+nichts aus.
+
+Trägst du versehentlich einen Einladungslink (`discord.gg/…`) ein, findet sich darin
+keine Server-ID – dann erscheint statt des Widgets ein schlichter Knopf zum Server.
+
+**Zum Datenschutz:** Das Widget lädt erst, wenn Besucher auf *Widget laden* klicken.
+Vorher geht keine Anfrage an Discord. Das ist Absicht – ein automatisch geladenes
+Fremd-Widget überträgt die IP-Adresse deiner Besucher an Discord, was in Deutschland
+ohne Einwilligung heikel ist. Sobald du das Widget nutzt, gehört Discord als
+Empfänger in deine Datenschutzerklärung.
 
 ## Die Zierschrift
 

@@ -52,11 +52,14 @@
   if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
 
   $('#theme-toggle').addEventListener('click', function () {
-    var current = document.documentElement.getAttribute('data-theme');
-    if (!current) current = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    var next = current === 'dark' ? 'light' : 'dark';
+    var next = activeTheme() === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     store('theme', next);
+
+    // Discord rendert sein Widget serverseitig – neu laden, sonst bleibt es
+    // im alten Design stehen.
+    var frame = $('#discord-frame');
+    if (frame) frame.src = discordSrc();
   });
 
   txt($('#year'), new Date().getFullYear());
@@ -115,8 +118,78 @@
     buildContactLinks($('#footer-contact'), s, false, 'plain');
 
     buildAnnounce(s);
+    buildDiscord(s);
     buildLegal('imprint', s.imprint, 'Impressum');
     buildLegal('privacy', s.privacy, 'Datenschutz');
+  }
+
+  /* ---------- Discord-Widget ---------- */
+  var discordId = null;
+
+  /** Holt die Server-ID aus Einbettungscode, Widget-Adresse oder purer Zahl. */
+  function discordServerId(value) {
+    var m = String(value || '').match(/(?:\bid=)?(\d{15,25})/);
+    return m ? m[1] : null;
+  }
+
+  function buildDiscord(s) {
+    var raw = String(s.discord || '').trim();
+    if (!raw) return;
+
+    discordId = discordServerId(raw);
+
+    // Einladungslinks enthalten keine Server-ID. Statt nichts anzuzeigen,
+    // gibt es dann wenigstens einen Knopf zum Server.
+    if (!discordId) {
+      var url = (raw.match(/https?:\/\/\S+/) || [])[0];
+      if (!url) {
+        console.warn('Discord: weder Server-ID noch Adresse erkannt.');
+        return;
+      }
+      var box = $('#discord-box');
+      box.textContent = '';
+      var a = el('a', 'btn btn-ghost');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = 'Discord beitreten';
+      box.appendChild(a);
+      show(box, true);
+      return;
+    }
+
+    show($('#discord-box'), true);
+    $('#discord-load').addEventListener('click', loadDiscord);
+
+    // Wer schon zugestimmt hat, bekommt es beim Blättern direkt zu sehen.
+    if (store('discord') === 'ja') loadDiscord();
+  }
+
+  function loadDiscord() {
+    store('discord', 'ja');
+    var frame = el('iframe', 'discord-frame');
+    frame.id = 'discord-frame';
+    frame.title = 'Discord-Server';
+    frame.src = discordSrc();
+    frame.setAttribute('allowtransparency', 'true');
+    frame.setAttribute('frameborder', '0');
+    frame.setAttribute('loading', 'lazy');
+    frame.setAttribute('sandbox',
+      'allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts');
+
+    var box = $('#discord-box');
+    box.textContent = '';
+    box.appendChild(frame);
+  }
+
+  function discordSrc() {
+    return 'https://discord.com/widget?id=' + discordId + '&theme=' + activeTheme();
+  }
+
+  function activeTheme() {
+    var set = document.documentElement.getAttribute('data-theme');
+    if (set) return set;
+    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
   function setImage(node, path, alt) {
@@ -160,7 +233,6 @@
     if (s.tiktok) entries.push({ href: social('tiktok.com/@', s.tiktok, true), label: 'TikTok', ext: true });
     if (s.youtube) entries.push({ href: social('youtube.com/@', s.youtube, true), label: 'YouTube', ext: true });
     if (s.etsy) entries.push({ href: social('etsy.com/shop/', s.etsy, true), label: 'Etsy', ext: true });
-    if (s.discord) entries.push({ href: s.discord, label: 'Discord', ext: true });
     if (s.phone) entries.push({ href: 'tel:' + String(s.phone).replace(/[^\d+]/g, ''), label: s.phone });
 
     entries.forEach(function (e) {

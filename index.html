@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="JazzyBunny Studios">
 <meta property="og:description" content="Galerie für individuelle 3D-Druck Objekte">
-<link rel="stylesheet" href="assets/style.css?v=4">
+<link rel="stylesheet" href="assets/style.css?v=5">
 <link rel="icon" type="image/png" href="assets/favicon.png?v=2">
 </head>
 <body class="booting">
@@ -169,6 +169,17 @@
       <h2 class="section-title" id="contact-title">Kontakt</h2>
       <p class="contact-lead" id="contact-lead">Interesse an einem Objekt oder einer eigenen Idee? Schreib mir gerne.</p>
       <div id="contact-links" class="contact-links"></div>
+
+      <!-- Discord-Widget: lädt erst auf Klick, damit vorher keine Daten
+           an Discord gehen. -->
+      <div id="discord-box" class="discord-box" hidden>
+        <div class="discord-gate">
+          <strong>Community auf Discord</strong>
+          <p>Beim Laden baut dein Browser eine Verbindung zu Discord auf und
+             übermittelt dabei deine IP-Adresse dorthin.</p>
+          <button type="button" class="btn btn-primary" id="discord-load">Widget laden</button>
+        </div>
+      </div>
     </div>
   </section>
 </main>
@@ -237,6 +248,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=4"></script>
+<script src="assets/app.js?v=5"></script>
 </body>
 </html>

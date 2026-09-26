@@ -409,11 +409,19 @@ collections:
             widget: string
             required: false
 
-          - label: Discord-Einladung
+          - label: Discord-Widget
             name: discord
-            widget: string
+            widget: text
             required: false
-            hint: Volle Einladungs-Adresse.
+            hint: >-
+              Zeigt deinen Server im Kontaktbereich, mit Mitgliederliste und
+              Beitreten-Knopf. Hier den kompletten Einbettungscode einfügen,
+              die Widget-Adresse oder einfach nur die Server-ID – ich hole
+              mir die Nummer selbst heraus. Den Code findest du in Discord
+              unter Servereinstellungen → Widget; dort muss "Server-Widget
+              aktivieren" eingeschaltet sein, sonst bleibt es leer.
+              Aus Datenschutzgründen lädt das Widget erst, wenn Besucher
+              darauf klicken. Leer lassen blendet es aus.
 
           - label: Telefon
             name: phone

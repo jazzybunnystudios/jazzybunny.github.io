@@ -495,6 +495,29 @@ html[data-theme="light"] .maintenance-logo { filter: invert(1); }
 .contact-links a:hover { border-color: var(--accent); color: var(--accent); }
 .contact-links p { color: var(--fg-dim); font-size: .9rem; }
 
+/* ---------- Discord-Widget ---------- */
+.discord-box { margin: 34px auto 0; max-width: 380px; }
+.discord-box[hidden] { display: none; }
+
+.discord-gate {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--bg-elev); padding: 26px 22px;
+}
+.discord-gate strong {
+  font-size: .82rem; font-weight: 800;
+  letter-spacing: .14em; text-transform: uppercase;
+}
+.discord-gate p {
+  margin: 0; color: var(--fg-dim); font-size: .82rem; line-height: 1.5; max-width: 34ch;
+}
+
+.discord-frame {
+  display: block; width: 100%; height: 460px;
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--bg-elev);
+}
+
 /* ---------- Fußzeile ---------- */
 .site-footer { background: var(--bg-sunken); border-top: 1px solid var(--border); }
 .footer-grid {
