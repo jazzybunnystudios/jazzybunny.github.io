@@ -1,3 +1,14 @@
 {
-  "items": []
+  "items": [
+    {
+      "nsfw": false,
+      "featured": false,
+      "image": "/images/uploads/bild_2026-08-02_180623977.png",
+      "title": "Placeholder",
+      "category": "Placeholder",
+      "badge": "Auf Anfrage",
+      "description": "Placeholder",
+      "price_note": "20 Euro"
+    }
+  ]
 }
