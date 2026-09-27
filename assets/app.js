@@ -169,7 +169,7 @@
     return String(tpl)
       .replace(/\{titel\}/gi, item.title || 'Objekt')
       .replace(/\{id\}/gi, item.product_id || '')
-      .replace(/\{preis\}/gi, reducedPrice(item) || item.price_note || '')
+      .replace(/\{preis\}/gi, reducedPrice(item) || priceLabel(item.price_note))
       .replace(/\{kategorie\}/gi, item.category || '')
       .replace(/\(\s*\)|\[\s*\]/g, '')
       .replace(/\s{2,}/g, ' ')
@@ -650,20 +650,51 @@
   }
 
   /**
-   * Rechnet die erste Zahl im Preis-Hinweis herunter und setzt sie an
-   * derselben Stelle wieder ein. So bleiben "ab", Währung und Schreibweise
-   * erhalten: "ab 24 EUR" wird zu "ab 19,20 EUR".
+   * Zahlen in deutscher wie englischer Schreibweise.
+   * "1.200,50" -> 1200.5 · "1.200" -> 1200 · "9.99" -> 9.99 · "39,90" -> 39.9
+   * Der Punkt ist nur dann ein Tausendertrenner, wenn ihm genau drei Ziffern
+   * folgen – sonst wäre "9.99" fälschlich 999.
+   */
+  function parseNumber(str) {
+    var s = String(str).trim();
+    if (s.indexOf(',') !== -1) {
+      s = s.replace(/\./g, '').replace(',', '.');
+    } else if (/^\d{1,3}(?:\.\d{3})+$/.test(s)) {
+      s = s.replace(/\./g, '');
+    }
+    return parseFloat(s);
+  }
+
+  /**
+   * Was im Preisfeld steht, für die Anzeige aufbereitet. Eine reine Zahl
+   * bekommt das Euro-Zeichen dazu ("24" wird zu "24 €"). Steht dort Text
+   * wie "ab 24 EUR" oder "Preis auf Anfrage", bleibt er unangetastet.
+   */
+  function priceLabel(raw) {
+    var v = String(raw == null ? '' : raw).trim();
+    if (!v) return '';
+    if (/^[\d.,]+$/.test(v)) {
+      var n = parseNumber(v);
+      if (isFinite(n)) return formatPrice(n) + ' €';
+    }
+    return v;
+  }
+
+  /**
+   * Rechnet die erste Zahl im Preis herunter und setzt sie an derselben
+   * Stelle wieder ein. So bleiben "ab", Währung und Schreibweise erhalten:
+   * "ab 24 EUR" wird zu "ab 19,20 EUR".
    * Ohne Zahl im Text (z. B. "Preis auf Anfrage") gibt es null zurück.
    */
   function reducedPrice(item) {
     var pct = salePercent(item);
-    if (!pct || !item.price_note) return null;
+    var text = priceLabel(item.price_note);
+    if (!pct || !text) return null;
 
-    var text = String(item.price_note);
-    var m = text.match(/\d+(?:[.,]\d+)?/);
+    var m = text.match(/\d[\d.,]*/);
     if (!m) return null;
 
-    var value = parseFloat(m[0].replace(',', '.'));
+    var value = parseNumber(m[0]);
     if (!isFinite(value) || value <= 0) return null;
 
     return text.slice(0, m.index) + formatPrice(value * (1 - pct / 100)) +
@@ -681,19 +712,21 @@
 
   /** Preis als Anzeige: bei Rabatt alt durchgestrichen, neu daneben. */
   function priceNode(item, cls) {
-    if (!item.price_note) return null;
+    var label = priceLabel(item.price_note);
+    if (!label) return null;
+
     var box = el('span', cls);
     var neu = reducedPrice(item);
 
     if (neu) {
       var alt = el('s', 'price-old');
-      alt.textContent = item.price_note;
+      alt.textContent = label;
       var jetzt = el('b', 'price-new');
       jetzt.textContent = neu;
       box.appendChild(alt);
       box.appendChild(jetzt);
     } else {
-      box.textContent = item.price_note;
+      box.textContent = label;
     }
     return box;
   }

@@ -184,13 +184,16 @@ collections:
                 required: false
                 hint: 'z. B. "Auf Lager", "Fertigung 3–5 Tage", "Nur auf Bestellung"'
 
-              - label: Preis-Hinweis
+              - label: Preis
                 name: price_note
                 widget: string
                 required: false
                 hint: >-
-                  Reine Textangabe, z. B. "ab 25 €" oder "Preis auf Anfrage".
-                  Es gibt keinen Warenkorb – Bestellungen laufen über den Kontakt.
+                  Am einfachsten nur die Zahl: aus "24" wird "24 €", aus
+                  "1200,50" wird "1.200,50 €". Du kannst aber auch frei
+                  schreiben – "ab 25 €" oder "Preis auf Anfrage" bleiben
+                  genau so stehen. Es gibt keinen Warenkorb, Bestellungen
+                  laufen über den Kontakt.
 
               - label: Weitere Bilder
                 name: gallery

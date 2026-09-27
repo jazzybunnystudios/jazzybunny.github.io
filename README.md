@@ -281,20 +281,35 @@ Deshalb steht in `admin/index.html`:
 arbeitest du bis zu zehn Minuten mit der alten Fassung weiter und suchst den Fehler an
 der falschen Stelle.
 
+## Preise
+
+Im Feld **Preis** reicht die reine Zahl – das Euro-Zeichen und die Tausenderpunkte
+kommen von allein:
+
+| Eingabe | Anzeige |
+|---|---|
+| `24` | 24 € |
+| `1200` | 1.200 € |
+| `39,90` | 39,90 € |
+| `9.99` | 9,99 € |
+
+Sobald etwas anderes als Ziffern, Punkt oder Komma darin steht, bleibt der Text
+unangetastet: `ab 25 EUR` und `Preis auf Anfrage` erscheinen genau so.
+
 ## Rabatte
 
 Schalte beim Objekt **Sale** ein und trag bei **Rabatt in Prozent** eine Zahl ein.
 Dann passiert zweierlei: Auf dem Bild erscheint ein rotes Schild „-20 %", und der
 Preis wird ausgerechnet.
 
-Gerechnet wird mit der **ersten Zahl im Preis-Hinweis**, und sie wird an genau
-derselben Stelle wieder eingesetzt. Alles drumherum bleibt stehen:
+Gerechnet wird mit der **ersten Zahl im Preis**, und sie wird an genau derselben
+Stelle wieder eingesetzt. Alles drumherum bleibt stehen:
 
-| Preis-Hinweis | mit 20 % Rabatt |
+| Preis | mit 20 % Rabatt |
 |---|---|
+| `24` | ~~24 €~~ **19,20 €** |
+| `1200` | ~~1.200 €~~ **960 €** |
 | `ab 24 EUR` | ~~ab 24 EUR~~ **ab 19,20 EUR** |
-| `39,90 €` | ~~39,90 €~~ **31,92 €** |
-| `100 EUR` | ~~100 EUR~~ **80 EUR** |
 | `Preis auf Anfrage` | unverändert – keine Zahl zum Rechnen |
 
 Glatte Beträge bekommen keine Nachkommastellen, krumme werden auf zwei gerundet
