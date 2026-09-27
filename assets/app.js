@@ -114,6 +114,9 @@
     txt($('#footer-about'), s.about || '');
     txt($('#footer-note'), s.footer_note || '');
 
+    // Muss vor den Kontaktlinks laufen – die greifen auf die Nummer zu.
+    buildWhatsApp(s);
+
     buildContactLinks($('#contact-links'), s, true, 'button');
     buildContactLinks($('#footer-contact'), s, false, 'plain');
 
@@ -121,6 +124,38 @@
     buildDiscord(s);
     buildLegal('imprint', s.imprint, 'Impressum');
     buildLegal('privacy', s.privacy, 'Datenschutz');
+  }
+
+  /* ---------- WhatsApp ---------- */
+  var waNumber = null;
+
+  /**
+   * Holt die reine Rufnummer heraus – egal ob Nummer mit Vorwahl, wa.me-Link
+   * oder api.whatsapp.com-Adresse eingetragen wurde.
+   */
+  function whatsappNumber(value) {
+    var v = String(value || '').trim();
+    if (!v) return null;
+
+    var m = v.match(/(?:wa\.me\/|phone=)(\d{6,20})/i);
+    if (m) return m[1];
+
+    var digits = v.replace(/[^\d]/g, '');           // "+49 170 …" -> "49170…"
+    return digits.length >= 6 ? digits : null;
+  }
+
+  /** Baut eine wa.me-Adresse mit vorformulierter Nachricht. */
+  function whatsappLink(text) {
+    return 'https://wa.me/' + waNumber + (text ? '?text=' + encodeURIComponent(text) : '');
+  }
+
+  function buildWhatsApp(s) {
+    waNumber = whatsappNumber(s.whatsapp);
+    if (!waNumber) return;
+
+    var float = $('#wa-float');
+    float.href = whatsappLink('Hallo! Ich habe eine Frage zu ' + (s.title || 'euren Objekten') + '.');
+    show(float, true);
   }
 
   /* ---------- Discord-Widget ---------- */
@@ -224,6 +259,7 @@
     container.textContent = '';
 
     var entries = [];
+    if (waNumber) entries.push({ href: whatsappLink('Hallo!'), label: 'WhatsApp', ext: true });
     if (s.email) entries.push({ href: 'mailto:' + s.email, label: style === 'plain' ? 'E-Mail' : s.email });
     if (s.instagram) entries.push({ href: social('instagram.com', s.instagram), label: 'Instagram', ext: true });
     if (s.tiktok) entries.push({ href: social('tiktok.com/@', s.tiktok, true), label: 'TikTok', ext: true });
@@ -651,6 +687,7 @@
     imgIndex = imageIdx || 0;
     show(lb, true);
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('lightbox-open');
     updateLightbox();
     lb.querySelector('.lb-close').focus();
   }
@@ -658,6 +695,7 @@
   function closeLightbox() {
     show(lb, false);
     document.body.style.overflow = '';
+    document.body.classList.remove('lightbox-open');
     if (lastFocused && lastFocused.focus) lastFocused.focus();
   }
 
@@ -714,17 +752,46 @@
 
   function buildCta(item) {
     var cta = $('#lb-cta');
-    if (settings.email) {
-      // Produkt-ID mit in den Betreff – erspart Rückfragen, welches Teil gemeint ist.
-      var betreff = 'Anfrage: ' + (item.title || 'Objekt');
-      if (item.product_id) betreff += ' (' + item.product_id + ')';
-      cta.href = 'mailto:' + settings.email + '?subject=' + encodeURIComponent(betreff);
-      txt(cta, 'Nach diesem Objekt fragen');
+    var name = item.title || 'Objekt';
+    var kennung = item.product_id ? ' (' + item.product_id + ')' : '';
+
+    cta.onclick = null;
+    cta.removeAttribute('target');
+    cta.removeAttribute('rel');
+    cta.className = 'btn btn-primary lb-cta';
+
+    if (waNumber) {
+      // Direkt zur Bestellung, Objektname und Produkt-ID stehen schon drin.
+      cta.className = 'btn btn-wa lb-cta';
+      cta.href = whatsappLink('Hallo! Ich möchte gerne bestellen: ' + name + kennung);
+      cta.target = '_blank';
+      cta.rel = 'noopener';
+      setCtaLabel(cta, 'Über WhatsApp bestellen', true);
+
+    } else if (settings.email) {
+      cta.href = 'mailto:' + settings.email +
+        '?subject=' + encodeURIComponent('Anfrage: ' + name + kennung);
+      setCtaLabel(cta, 'Nach diesem Objekt fragen', false);
+
     } else {
       cta.href = '#kontakt';
-      txt(cta, 'Zum Kontakt');
-      cta.addEventListener('click', closeLightbox, { once: true });
+      cta.onclick = closeLightbox;
+      setCtaLabel(cta, 'Zum Kontakt', false);
     }
+  }
+
+  function setCtaLabel(cta, label, withIcon) {
+    cta.textContent = '';
+    if (withIcon) cta.appendChild(whatsappIcon());
+    var span = el('span');
+    span.textContent = label;
+    cta.appendChild(span);
+  }
+
+  /** Kopie des Zeichens aus dem schwebenden Knopf. */
+  function whatsappIcon() {
+    var src = $('#wa-float svg');
+    return src ? src.cloneNode(true) : document.createTextNode('');
   }
 
   function buildThumbs(imgs) {

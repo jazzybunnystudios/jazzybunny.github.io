@@ -390,13 +390,25 @@ collections:
             hint: Farbe für Knöpfe, Aufkleber und Überschriften-Striche.
 
           # --- Kontakt ---
+          - label: WhatsApp
+            name: whatsapp
+            widget: string
+            required: false
+            hint: >-
+              Nummer mit Ländervorwahl (z. B. "+49 170 1234567") oder ein
+              fertiger wa.me-Link. Ist das Feld gefüllt, führt der Knopf in
+              der Detailansicht direkt zu WhatsApp statt zum Kontaktbereich –
+              mit Objektname und Produkt-ID schon in der Nachricht. Zusätzlich
+              erscheint unten rechts ein schwebender WhatsApp-Knopf.
+
           - label: E-Mail
             name: email
             widget: string
             required: false
             hint: >-
-              Wird auch für den Knopf "Nach diesem Objekt fragen" in der
-              Detailansicht verwendet – der Objektname landet im Betreff.
+              Rückfallebene für den Bestellknopf, falls keine WhatsApp-Nummer
+              hinterlegt ist – dann öffnet er eine E-Mail mit dem Objektnamen
+              im Betreff.
 
           - label: Instagram
             name: instagram

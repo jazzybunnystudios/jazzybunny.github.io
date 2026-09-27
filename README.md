@@ -134,8 +134,9 @@ Leere Listen blenden den jeweiligen Abschnitt komplett aus.
 
 ### Einstellungen → Seite & Kontakt
 
-Sperre, Ankündigungsleiste, Logo, **Akzentfarbe**, Kontaktdaten (E-Mail, Instagram,
-TikTok, YouTube, Etsy, Telefon), das **Discord-Widget**, Impressum und Datenschutz.
+Sperre, Ankündigungsleiste, Logo, **Akzentfarbe**, **WhatsApp**, Kontaktdaten
+(E-Mail, Instagram, TikTok, YouTube, Etsy, Telefon), das **Discord-Widget**,
+Impressum und Datenschutz.
 
 Jedes „Publish" ist ein Commit. Nach ein bis zwei Minuten hat GitHub Pages neu
 ausgeliefert und die Änderung ist live.
@@ -277,6 +278,33 @@ Deshalb steht in `admin/index.html`:
 **Nach jeder Änderung an `config.yml` die Zahl hochzählen** (`?v=6`, `?v=7`, …). Sonst
 arbeitest du bis zu zehn Minuten mit der alten Fassung weiter und suchst den Fehler an
 der falschen Stelle.
+
+## Bestellung über WhatsApp
+
+Trägst du unter **Einstellungen → WhatsApp** eine Nummer ein, ändert sich dreierlei:
+
+* Der Knopf in der Detailansicht wird grün und heißt **„Über WhatsApp bestellen"**.
+  Er führt direkt in den Chat – mit Objektname und Produkt-ID schon in der Nachricht,
+  also ohne Umweg über den Kontaktbereich.
+* Unten rechts erscheint ein **schwebender WhatsApp-Knopf**, der auf jeder Position der
+  Seite erreichbar ist. Bei geöffneter Detailansicht blendet er sich aus, auf dem Handy
+  schrumpft er auf das bloße Zeichen.
+* **WhatsApp** taucht zusätzlich bei den Kontaktknöpfen auf.
+
+Eintragen kannst du, was dir vorliegt – die Nummer wird herausgelöst:
+
+| Eingabe | Ergebnis |
+|---|---|
+| `+49 170 1234567` | ✓ |
+| `+49 (170) 123-4567` | ✓ |
+| `https://wa.me/491701234567` | ✓ |
+| `https://api.whatsapp.com/send?phone=491701234567` | ✓ |
+
+**Die Ländervorwahl muss dabei sein** (49 für Deutschland), sonst weiß WhatsApp nicht,
+wen es anrufen soll. Eine führende Null der Ortsvorwahl entfällt.
+
+Ist das Feld leer, fällt der Bestellknopf auf die E-Mail-Adresse zurück; fehlt auch die,
+führt er zum Kontaktbereich.
 
 ## Discord-Widget
 

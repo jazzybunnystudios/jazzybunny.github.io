@@ -128,6 +128,12 @@ a { color: inherit; }
 .btn-ghost { background: transparent; color: var(--fg); border-color: var(--border-strong); }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 
+/* WhatsApp-Gruen, in beiden Designs dasselbe – die Marke ist so bekannt,
+   dass eine Abwandlung nur verwirren wuerde. */
+.btn-wa { background: #25d366; color: #05231a; gap: 10px; letter-spacing: .06em; padding-inline: 20px; }
+.btn-wa:hover { background: #1fbb5a; }
+.btn-wa svg { flex: none; }
+
 .linklike {
   background: none; border: 0; padding: 0; color: inherit; font: inherit;
   cursor: pointer; text-align: left;
@@ -618,6 +624,29 @@ html[data-theme="light"] .maintenance-logo { filter: invert(1); }
 }
 .spec dd { padding: 10px 0; margin: 0; border-top: 1px solid var(--border); }
 .lb-cta { width: 100%; }
+
+/* ---------- Schwebender WhatsApp-Knopf ---------- */
+.wa-float {
+  position: fixed; right: 18px; bottom: 18px; z-index: 90;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 13px 20px; border-radius: 999px;
+  background: #25d366; color: #05231a; text-decoration: none;
+  font-size: .8rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  box-shadow: 0 4px 14px rgba(0,0,0,.3), 0 12px 34px rgba(0,0,0,.35);
+  transition: transform .15s, background .15s;
+}
+.wa-float[hidden] { display: none; }
+.wa-float:hover { background: #1fbb5a; transform: translateY(-2px); }
+.wa-float svg { flex: none; }
+
+/* Auf dem Handy nur das Zeichen, sonst verdeckt der Knopf zu viel. */
+@media (max-width: 560px) {
+  .wa-float { padding: 15px; right: 14px; bottom: 14px; }
+  .wa-float span { display: none; }
+}
+
+/* Bei offener Detailansicht stoert er nur. */
+body.lightbox-open .wa-float { display: none; }
 
 /* ---------- Rechtstexte ---------- */
 .legal-modal { align-items: flex-start; overflow-y: auto; }
