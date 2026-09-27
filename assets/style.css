@@ -104,7 +104,9 @@ body {
 img { max-width: 100%; display: block; }
 a { color: inherit; }
 
-.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+/* Nur seitlich einruecken. Die Kurzform "padding: 0 24px" wuerde bei jedem
+   Element mit .wrap auch den senkrechten Abstand auf null setzen. */
+.wrap { max-width: var(--wrap); margin: 0 auto; padding-inline: 24px; }
 .wrap-narrow { max-width: 860px; }
 
 .visually-hidden {
@@ -165,10 +167,11 @@ a { color: inherit; }
 .announce-close:hover { opacity: 1; }
 
 /* ---------- Kopfzeile ---------- */
+/* Deckender Hintergrund: Produktfotos sind oft hell und schienen vorher
+   durch die halbdurchsichtige Leiste hinter das Logo. */
 .site-header {
   position: sticky; top: 0; z-index: 60;
-  background: color-mix(in srgb, var(--bg) 90%, transparent);
-  backdrop-filter: saturate(180%) blur(14px);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 .header-inner {
@@ -884,7 +887,7 @@ html[data-theme="light"] .ico-moon { display: none; }
   .row-head { margin-bottom: 24px; }
   .cat-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; }
   .card-body { padding: 13px 13px 16px; }
-  .wrap { padding: 0 16px; }
+  .wrap { padding-inline: 16px; }
 }
 
 @media (max-width: 560px) {
