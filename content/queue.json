@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-27T21:18:27.581614900+02:00",
+  "updatedAt": "2026-09-27T21:19:26.487848600+02:00",
   "stages": [
     {
       "id": "angenommen",
@@ -14,6 +14,11 @@
     {
       "id": "druck",
       "label": "Im Druck",
+      "orders": []
+    },
+    {
+      "id": "weiterverarbeitung",
+      "label": "Weiterverarbeitung",
       "orders": [
         {
           "code": "JB-2026-0001",
@@ -28,11 +33,6 @@
           ]
         }
       ]
-    },
-    {
-      "id": "weiterverarbeitung",
-      "label": "Weiterverarbeitung",
-      "orders": []
     },
     {
       "id": "verpackt",
