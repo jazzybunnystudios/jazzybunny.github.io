@@ -1,9 +1,14 @@
 {
-  "updatedAt": "2026-09-27T19:25:14.450901800+02:00",
+  "updatedAt": "2026-09-27T21:16:29.262356100+02:00",
   "stages": [
     {
       "id": "angenommen",
       "label": "Auftrag angenommen",
+      "orders": []
+    },
+    {
+      "id": "bearbeitung",
+      "label": "In Bearbeitung",
       "orders": [
         {
           "code": "JB-2026-0001",
@@ -18,11 +23,6 @@
           ]
         }
       ]
-    },
-    {
-      "id": "bearbeitung",
-      "label": "In Bearbeitung",
-      "orders": []
     },
     {
       "id": "druck",
