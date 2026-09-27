@@ -85,7 +85,9 @@
     if (settings.maintenance) show($('#adminbar'), true);   // Admin sieht die Seite
 
     applyHome(home, settings);
-    if (istUeberUns) loadAbout(); else loadGallery();
+    if (istUeberUns) loadAbout();
+    else if (istWarteschlange) loadQueue();
+    else loadGallery();
   });
 
   /* ================= Sperre und Admin-Vorschau ================= */
@@ -463,6 +465,143 @@
     }
   }
 
+  /* ================= Warteschlange ================= */
+
+  /**
+   * Die Datei content/queue.json schreibt die Auftragsverwaltung automatisch.
+   * Sie enthält bewusst nur Auftragsnummer, Produkt-ID, Name und Bild –
+   * keine Kundendaten.
+   */
+  function loadQueue() {
+    var texte = {};
+    loadJSON('content/queue-page.json').catch(function () { return {}; })
+      .then(function (t) {
+        texte = t || {};
+        applyQueueTexts(texte);
+        return loadJSON('content/queue.json');
+      })
+      .then(function (q) {
+        show($('#queue-loading'), false);
+        renderQueue(q || {}, texte);
+      })
+      .catch(function (err) {
+        console.error(err);
+        show($('#queue-loading'), false);
+        show($('#queue-error'), true);
+      });
+  }
+
+  function applyQueueTexts(t) {
+    if (t.title) {
+      txt($('#queue-title'), t.title);
+      document.title = t.title + ' – ' + (settings.title || 'Startseite');
+    }
+    txt($('#queue-intro'), t.intro || '');
+
+    if (t.hint_title || t.hint_text) {
+      txt($('#queue-hint-title'), t.hint_title || 'So findest du deinen Auftrag');
+      txt($('#queue-hint-text'), t.hint_text || '');
+      show($('#queue-hint'), true);
+    }
+  }
+
+  function renderQueue(q, t) {
+    if (q.updatedAt) {
+      var d = new Date(q.updatedAt);
+      if (!isNaN(d)) {
+        txt($('#queue-updated'), 'Zuletzt aktualisiert: ' +
+          d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+          ' um ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr');
+      }
+    }
+
+    var stufen = Array.isArray(q.stages) ? q.stages : [];
+    var gesamt = stufen.reduce(function (n, st) {
+      return n + (Array.isArray(st.orders) ? st.orders.length : 0);
+    }, 0);
+
+    if (!gesamt) { show($('#queue-empty'), true); return; }
+
+    var box = $('#queue-stages');
+    var nummer = 0;
+
+    stufen.forEach(function (st) {
+      var auftraege = Array.isArray(st.orders) ? st.orders : [];
+      if (!auftraege.length) return;               // leere Stufen weglassen
+      nummer++;
+
+      var sek = el('section', 'queue-stage');
+
+      var kopf = el('div', 'queue-stage-head');
+      var num = el('span', 'queue-num');
+      num.textContent = ('0' + nummer).slice(-2);
+      kopf.appendChild(num);
+
+      var txtBox = el('div');
+      var h2 = el('h2');
+      h2.textContent = st.label || st.id || '';
+      txtBox.appendChild(h2);
+
+      var beschreibung = t && t['stage_' + st.id];
+      if (beschreibung) {
+        var p = el('p');
+        p.textContent = beschreibung;
+        txtBox.appendChild(p);
+      }
+      kopf.appendChild(txtBox);
+
+      var zahl = el('span', 'queue-count');
+      zahl.textContent = auftraege.length;
+      kopf.appendChild(zahl);
+      sek.appendChild(kopf);
+
+      var liste = el('div', 'queue-list');
+      auftraege.forEach(function (a) { liste.appendChild(queueRow(a)); });
+      sek.appendChild(liste);
+
+      box.appendChild(sek);
+    });
+  }
+
+  function queueRow(a) {
+    var zeile = el('div', 'queue-row');
+    var erstes = (a.items && a.items[0]) || {};
+
+    var bild = el('div', 'queue-thumb');
+    if (erstes.image) {
+      var img = el('img');
+      img.src = mediaUrl(erstes.image);
+      img.alt = '';
+      img.loading = 'lazy';
+      if (erstes.nsfw) bild.classList.add('is-nsfw');   // verdeckt wie in der Galerie
+      bild.appendChild(img);
+    } else {
+      bild.classList.add('is-empty');
+    }
+    zeile.appendChild(bild);
+
+    var mitte = el('div', 'queue-main');
+    (a.items || []).forEach(function (it) {
+      var z = el('div', 'queue-item');
+      var name = el('span', 'queue-name');
+      name.textContent = (it.qty && it.qty > 1 ? it.qty + '× ' : '') + (it.title || 'Objekt');
+      z.appendChild(name);
+      if (it.productId) {
+        var pid = el('span', 'queue-pid');
+        pid.textContent = it.productId;
+        z.appendChild(pid);
+      }
+      mitte.appendChild(z);
+    });
+    zeile.appendChild(mitte);
+
+    var code = el('span', 'queue-code');
+    code.textContent = a.code || '';
+    zeile.appendChild(code);
+
+    return zeile;
+  }
+
   /* ================= Über uns ================= */
 
   function loadAbout() {
@@ -569,6 +708,7 @@
   // die Produktseite hat die Filterspalte, die Startseite die Reihen.
   var istShop = !!$('.shop-side');
   var istUeberUns = !!$('#about-sections');
+  var istWarteschlange = !!$('#queue-stages');
 
   var allItems = [];
   var visibleItems = [];

@@ -1,0 +1,12 @@
+{
+  "title": "Warteschlange",
+  "intro": "Hier siehst du, in welcher Stufe dein Auftrag gerade steckt. Die Liste aktualisiert sich automatisch, sobald ich einen Auftrag weiterschiebe.",
+  "hint_title": "So findest du deinen Auftrag",
+  "hint_text": "Suche nach der Auftragsnummer aus deiner Bestätigung – sie steht rechts neben jedem Eintrag. Nicht gefunden oder unsicher? Schreib mir einfach.",
+  "stage_angenommen": "Der Auftrag ist eingegangen und wartet auf den Start.",
+  "stage_bearbeitung": "Modell wird vorbereitet, ausgerichtet und für den Druck eingerichtet.",
+  "stage_druck": "Das Objekt wird gerade gedruckt, Schicht für Schicht.",
+  "stage_weiterverarbeitung": "Stützen entfernen, schleifen, grundieren und bemalen.",
+  "stage_verpackt": "Fertig und verpackt – wartet auf den Versand.",
+  "stage_versendet": "Unterwegs zu dir."
+}

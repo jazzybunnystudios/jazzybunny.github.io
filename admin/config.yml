@@ -471,7 +471,80 @@ collections:
             hint: '"produkte.html", "index.html#kontakt" oder eine volle Adresse.'
 
   # =================================================================
-  #  4. Einstellungen
+  #  4. Warteschlange
+  # =================================================================
+  - name: queue
+    label: Warteschlange
+    delete: false
+    editor:
+      preview: false
+    files:
+      - name: page
+        label: Texte der Warteschlange
+        file: content/queue-page.json
+        format: json
+        description: >-
+          Nur die Texte der Seite warteschlange.html. Die Aufträge selbst
+          kommen automatisch aus der Auftragsverwaltung auf deinem Rechner –
+          die schreibt content/queue.json. Diese Datei hier bitte nicht im
+          CMS anlegen oder bearbeiten.
+        fields:
+          - label: Überschrift
+            name: title
+            widget: string
+            required: false
+            default: Warteschlange
+
+          - label: Einleitung
+            name: intro
+            widget: text
+            required: false
+
+          - label: Hinweiskasten – Überschrift
+            name: hint_title
+            widget: string
+            required: false
+            hint: Leer lassen blendet den Kasten aus.
+
+          - label: Hinweiskasten – Text
+            name: hint_text
+            widget: text
+            required: false
+
+          # --- Beschreibung je Stufe ---
+          - label: Stufe 1 – Auftrag angenommen
+            name: stage_angenommen
+            widget: text
+            required: false
+            hint: Kurze Erklärung unter der Stufenüberschrift. Leer lassen = keine Erklärung.
+
+          - label: Stufe 2 – In Bearbeitung
+            name: stage_bearbeitung
+            widget: text
+            required: false
+
+          - label: Stufe 3 – Im Druck
+            name: stage_druck
+            widget: text
+            required: false
+
+          - label: Stufe 4 – Weiterverarbeitung
+            name: stage_weiterverarbeitung
+            widget: text
+            required: false
+
+          - label: Stufe 5 – Verpackt
+            name: stage_verpackt
+            widget: text
+            required: false
+
+          - label: Stufe 6 – Versendet
+            name: stage_versendet
+            widget: text
+            required: false
+
+  # =================================================================
+  #  5. Einstellungen
   # =================================================================
   - name: settings
     label: Einstellungen

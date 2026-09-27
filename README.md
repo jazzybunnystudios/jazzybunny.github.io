@@ -154,7 +154,7 @@ ausgeliefert und die Änderung ist live.
 
 ## Die beiden Seiten
 
-Die Webseite besteht aus drei Seiten. Alle teilen sich Kopfzeile, Fußzeile,
+Die Webseite besteht aus vier Seiten. Alle teilen sich Kopfzeile, Fußzeile,
 Detailansicht, Design und Skript.
 
 ### Startseite (`index.html`)
@@ -189,6 +189,23 @@ Eigene Unterseite, komplett im Admin unter **Über uns** gepflegt:
 
 Leere Felder erscheinen nicht. Mit komplett leerem Inhalt bleibt nur die
 Überschrift stehen – kaputt sieht dabei nichts aus.
+
+### Warteschlange (`warteschlange.html`)
+
+Zeigt Kundinnen und Kunden, in welcher Stufe ihr Auftrag steckt. Die Seite hat zwei
+Quellen:
+
+| Datei | kommt von |
+|---|---|
+| `content/queue-page.json` | Admin → **Warteschlange** (Überschrift, Einleitung, Hinweiskasten, Beschreibung je Stufe) |
+| `content/queue.json` | **automatisch** von der Auftragsverwaltung auf deinem Rechner |
+
+`content/queue.json` niemals von Hand bearbeiten – sie wird bei jeder Auftragsänderung
+überschrieben. Sie enthält bewusst nur Auftragsnummer, Produkt-ID, Produktname und Bild;
+Kundendaten stehen nicht darin. Stufen ohne Aufträge werden übersprungen und die
+verbleibenden fortlaufend nummeriert. NSFW-Objekte erscheinen unscharf.
+
+Einrichtung des Uploads: siehe README der Auftragsverwaltung.
 
 ### Produktseite (`produkte.html`)
 
@@ -254,6 +271,7 @@ in der Config; auf der Live-Seite wird die Einstellung ignoriert.
 index.html              Startseite mit den kuratierten Reihen
 produkte.html           Produktseite mit Filterspalte
 ueber-uns.html          Seite "Über uns"
+warteschlange.html      Produktions-Warteschlange
 assets/style.css        Design (dunkel als Standard, heller Modus per Umschalter)
 assets/app.js           Lädt die JSON-Dateien und baut daraus die Seite
 assets/wordmark.webp    Wortmarke (Kopfzeile, Fußzeile, Sperrseite)
@@ -262,6 +280,8 @@ assets/favicon.png      Browser-Tab-Symbol (J-Monogramm)
 content/gallery.json    ← vom CMS: deine Objekte
 content/home.json       ← vom CMS: Bühne, Überschriften, Kennzahlen, FAQ
 content/about.json      ← vom CMS: Inhalte der Seite "Über uns"
+content/queue-page.json ← vom CMS: Texte der Warteschlange
+content/queue.json      ← von der Auftragsverwaltung: die Aufträge selbst
 content/settings.json   ← vom CMS: Titel, Logo, Farbe, Kontakt, Rechtstexte
 images/uploads/         ← hier landen die hochgeladenen Bilder
 admin/index.html        Lädt Decap CMS

@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alle Produkte – JazzyBunny Studios</title>
-<meta name="description" content="Alle Produkte von JazzyBunny Studios – Suche, Kategorien und Preisfilter">
+<title>Warteschlange – JazzyBunny Studios</title>
+<meta name="description" content="Produktions-Warteschlange von JazzyBunny Studios – in welcher Stufe steckt dein Auftrag?">
 <meta name="theme-color" content="#08080b">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Alle Produkte – JazzyBunny Studios">
+<meta property="og:title" content="Warteschlange – JazzyBunny Studios">
 <meta property="og:description" content="Galerie für individuelle 3D-Druck Objekte">
 <link rel="stylesheet" href="assets/style.css?v=20">
 <link rel="icon" type="image/png" href="assets/favicon.png?v=2">
@@ -53,9 +53,9 @@
 
     <nav class="main-nav" id="main-nav">
       <a href="index.html">Start</a>
-      <a href="produkte.html" aria-current="page">Produkte</a>
+      <a href="produkte.html">Produkte</a>
       <a href="ueber-uns.html">Über uns</a>
-      <a href="warteschlange.html">Warteschlange</a>
+      <a href="warteschlange.html" aria-current="page">Warteschlange</a>
       <a href="index.html#kategorien" data-nav="kategorien" hidden>Kategorien</a>
       <a href="index.html#faq" data-nav="faq" hidden>FAQ</a>
       <a href="index.html#kontakt">Kontakt</a>
@@ -78,93 +78,40 @@
 
 </header>
 
-<main id="top">
+<main id="top" class="queue-page">
   <div class="wrap page-head">
     <nav class="breadcrumb" aria-label="Pfad">
-      <a href="index.html">Start</a><span aria-hidden="true">/</span><span>Produkte</span>
+      <a href="index.html">Start</a><span aria-hidden="true">/</span><span>Warteschlange</span>
     </nav>
-    <h1 id="shop-title">Alle Produkte</h1>
+    <h1 id="queue-title">Warteschlange</h1>
+    <p class="about-intro" id="queue-intro"></p>
+    <p class="queue-updated" id="queue-updated"></p>
   </div>
 
-  <div class="wrap shop">
-    <aside class="shop-side">
-      <div class="side-block">
-        <label class="side-label" for="search-input">Suche</label>
-        <input type="search" id="search-input" placeholder="Name, Kategorie, Material …" autocomplete="off">
-      </div>
-
-      <div class="side-block" id="side-collections" hidden>
-        <span class="side-label">Auswahl</span>
-        <div id="collections" class="side-cats" role="group" aria-label="Nach Auswahl filtern"></div>
-      </div>
-
-      <div class="side-block" id="side-cats" hidden>
-        <span class="side-label">Kategorien</span>
-        <div id="filters" class="side-cats" role="group" aria-label="Nach Kategorie filtern"></div>
-      </div>
-
-      <div class="side-block">
-        <span class="side-label">Inhalt</span>
-        <label class="check">
-          <input type="checkbox" id="nsfw-toggle">
-          <span>NSFW ausblenden</span>
-        </label>
-      </div>
-
-      <div class="side-block">
-        <span class="side-label">Preis</span>
-        <div class="price-range">
-          <input type="number" id="price-min" placeholder="von" min="0" inputmode="numeric">
-          <span aria-hidden="true">—</span>
-          <input type="number" id="price-max" placeholder="bis" min="0" inputmode="numeric">
-        </div>
-      </div>
-
-      <button type="button" class="btn btn-ghost side-reset" id="reset-filters">Filter zurücksetzen</button>
-    </aside>
-
-    <div class="shop-main">
-      <div class="shop-bar">
-        <span class="result-count" id="result-count"></span>
-        <label class="sort">
-          <span class="visually-hidden">Sortierung</span>
-          <select id="sort-select">
-            <option value="default">Empfohlen</option>
-            <option value="az">Name A–Z</option>
-            <option value="za">Name Z–A</option>
-            <option value="preis-auf">Preis aufsteigend</option>
-            <option value="preis-ab">Preis absteigend</option>
-          </select>
-        </label>
-      </div>
-
-      <div id="active-filter" class="active-filter" hidden></div>
-
-      <div id="grid" class="grid" aria-live="polite"></div>
-
-      <div id="state-loading" class="state">
-        <div class="spinner" aria-hidden="true"></div>
-        <p>Produkte werden geladen …</p>
-      </div>
-
-      <div id="state-empty" class="state" hidden>
-        <h3>Noch keine Produkte</h3>
-        <p>Melde dich im Admin-Bereich an und lade dein erstes Bild hoch.</p>
-        <a class="btn btn-primary" href="admin/">Zum Admin-Bereich</a>
-      </div>
-
-      <div id="state-nohits" class="state" hidden>
-        <h3>Nichts gefunden</h3>
-        <p>Für diese Auswahl gibt es kein passendes Produkt.</p>
-        <button type="button" class="btn btn-ghost" id="reset-search">Filter zurücksetzen</button>
-      </div>
-
-      <div id="state-error" class="state" hidden>
-        <h3>Produkte konnten nicht geladen werden</h3>
-        <p><code>content/gallery.json</code> ist nicht erreichbar oder fehlerhaft.</p>
-      </div>
+  <div class="wrap wrap-narrow">
+    <div class="queue-hint" id="queue-hint" hidden>
+      <strong id="queue-hint-title"></strong>
+      <p id="queue-hint-text"></p>
     </div>
   </div>
+
+  <div class="wrap wrap-narrow queue-body" id="queue-stages"></div>
+
+  <div id="queue-loading" class="state">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Warteschlange wird geladen …</p>
+  </div>
+
+  <div id="queue-empty" class="state" hidden>
+    <h3>Gerade nichts in Arbeit</h3>
+    <p>Sobald ein Auftrag angenommen wurde, taucht er hier auf.</p>
+  </div>
+
+  <div id="queue-error" class="state" hidden>
+    <h3>Warteschlange nicht verfügbar</h3>
+    <p>Die Liste konnte nicht geladen werden. Schau später noch einmal vorbei.</p>
+  </div>
+</main>
 </main>
 
 <footer class="site-footer">
@@ -176,8 +123,8 @@
     <div class="footer-col">
       <h4>Entdecken</h4>
       <a href="index.html">Start</a>
+      <a href="produkte.html">Alle Produkte</a>
       <a href="ueber-uns.html">Über uns</a>
-      <a href="warteschlange.html">Warteschlange</a>
       <a href="index.html#kategorien" data-nav="kategorien" hidden>Kategorien</a>
       <a href="index.html#faq" data-nav="faq" hidden>FAQ</a>
     </div>
