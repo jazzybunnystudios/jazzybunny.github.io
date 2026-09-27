@@ -1,4 +1,48 @@
 {
-  "updatedAt": "",
-  "stages": []
+  "updatedAt": "2026-09-27T19:25:14.450901800+02:00",
+  "stages": [
+    {
+      "id": "angenommen",
+      "label": "Auftrag angenommen",
+      "orders": [
+        {
+          "code": "JB-2026-0001",
+          "items": [
+            {
+              "title": "Placeholder 3",
+              "image": "/images/uploads/bild_2026-08-02_180623977.png",
+              "productId": "123456",
+              "qty": 1,
+              "nsfw": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bearbeitung",
+      "label": "In Bearbeitung",
+      "orders": []
+    },
+    {
+      "id": "druck",
+      "label": "Im Druck",
+      "orders": []
+    },
+    {
+      "id": "weiterverarbeitung",
+      "label": "Weiterverarbeitung",
+      "orders": []
+    },
+    {
+      "id": "verpackt",
+      "label": "Verpackt",
+      "orders": []
+    },
+    {
+      "id": "versendet",
+      "label": "Versendet",
+      "orders": []
+    }
+  ]
 }
