@@ -169,7 +169,7 @@
     return String(tpl)
       .replace(/\{titel\}/gi, item.title || 'Objekt')
       .replace(/\{id\}/gi, item.product_id || '')
-      .replace(/\{preis\}/gi, item.price_note || '')
+      .replace(/\{preis\}/gi, reducedPrice(item) || item.price_note || '')
       .replace(/\{kategorie\}/gi, item.category || '')
       .replace(/\(\s*\)|\[\s*\]/g, '')
       .replace(/\s{2,}/g, ' ')
@@ -587,8 +587,7 @@
     media.appendChild(img);
 
     var badges = el('div', 'badges');
-    if (item.is_new) badges.appendChild(makeNewBadge());
-    if (item.badge) badges.appendChild(makeBadge(item.badge));
+    badgesFor(item).forEach(function (b) { badges.appendChild(b); });
     if (badges.children.length) media.appendChild(badges);
 
     if (isHidden(item)) {
@@ -622,11 +621,8 @@
     }
 
     var foot = el('div', 'card-foot');
-    if (item.price_note) {
-      var price = el('span', 'card-price');
-      price.textContent = item.price_note;
-      foot.appendChild(price);
-    }
+    var price = priceNode(item, 'card-price');
+    if (price) foot.appendChild(price);
     if (item.material) {
       var meta = el('span', 'card-meta');
       meta.textContent = item.material;
@@ -644,11 +640,94 @@
     return card;
   }
 
+  /* ---------- Rabatt ---------- */
+
+  /** Gültiger Prozentsatz, sonst 0. */
+  function salePercent(item) {
+    if (!item.sale) return 0;
+    var p = parseFloat(String(item.sale_percent).replace(',', '.'));
+    return (isFinite(p) && p > 0 && p < 100) ? p : 0;
+  }
+
+  /**
+   * Rechnet die erste Zahl im Preis-Hinweis herunter und setzt sie an
+   * derselben Stelle wieder ein. So bleiben "ab", Währung und Schreibweise
+   * erhalten: "ab 24 EUR" wird zu "ab 19,20 EUR".
+   * Ohne Zahl im Text (z. B. "Preis auf Anfrage") gibt es null zurück.
+   */
+  function reducedPrice(item) {
+    var pct = salePercent(item);
+    if (!pct || !item.price_note) return null;
+
+    var text = String(item.price_note);
+    var m = text.match(/\d+(?:[.,]\d+)?/);
+    if (!m) return null;
+
+    var value = parseFloat(m[0].replace(',', '.'));
+    if (!isFinite(value) || value <= 0) return null;
+
+    return text.slice(0, m.index) + formatPrice(value * (1 - pct / 100)) +
+           text.slice(m.index + m[0].length);
+  }
+
+  function formatPrice(n) {
+    var r = Math.round(n * 100) / 100;
+    var ganz = Math.abs(r - Math.round(r)) < 0.005;
+    return r.toLocaleString('de-DE', {
+      minimumFractionDigits: ganz ? 0 : 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  /** Preis als Anzeige: bei Rabatt alt durchgestrichen, neu daneben. */
+  function priceNode(item, cls) {
+    if (!item.price_note) return null;
+    var box = el('span', cls);
+    var neu = reducedPrice(item);
+
+    if (neu) {
+      var alt = el('s', 'price-old');
+      alt.textContent = item.price_note;
+      var jetzt = el('b', 'price-new');
+      jetzt.textContent = neu;
+      box.appendChild(alt);
+      box.appendChild(jetzt);
+    } else {
+      box.textContent = item.price_note;
+    }
+    return box;
+  }
+
+  /* ---------- Schilder ---------- */
+
   /** Grünes "Neu" – eigener Schalter, unabhängig vom Aufkleber-Feld. */
   function makeNewBadge() {
     var b = el('span', 'badge badge-new');
     b.textContent = 'Neu';
     return b;
+  }
+
+  function makeSaleBadge(item) {
+    var b = el('span', 'badge badge-sale');
+    var pct = salePercent(item);
+    b.textContent = pct ? '-' + formatPrice(pct) + ' %' : 'Sale';
+    return b;
+  }
+
+  function makeLimitedBadge() {
+    var b = el('span', 'badge badge-limited');
+    b.textContent = 'Limited Edition';
+    return b;
+  }
+
+  /** Alle Schilder eines Objekts in fester Reihenfolge. */
+  function badgesFor(item) {
+    var list = [];
+    if (item.sale) list.push(makeSaleBadge(item));
+    if (item.is_new) list.push(makeNewBadge());
+    if (item.is_limited) list.push(makeLimitedBadge());
+    if (item.badge) list.push(makeBadge(item.badge));
+    return list;
   }
 
   function makeBadge(text) {
@@ -738,8 +817,7 @@
 
     var badges = $('#lb-badges');
     badges.textContent = '';
-    if (item.is_new) badges.appendChild(makeNewBadge());
-    if (item.badge) badges.appendChild(makeBadge(item.badge));
+    badgesFor(item).forEach(function (b) { badges.appendChild(b); });
 
     txt($('#lb-desc'), item.description || '');
     buildSpec(item);
@@ -760,12 +838,13 @@
       ['Farben', item.colors],
       ['Druckzeit', item.print_time],
       ['Verfügbarkeit', item.status],
-      ['Preis', item.price_note],
+      ['Preis', priceNode(item, 'spec-price')],
       ['Produkt-ID', item.product_id]
     ].forEach(function (row) {
       if (!row[1]) return;
       var dt = el('dt'); dt.textContent = row[0];
-      var dd = el('dd'); dd.textContent = row[1];
+      var dd = el('dd');
+      if (row[1].nodeType) dd.appendChild(row[1]); else dd.textContent = row[1];
       dl.appendChild(dt); dl.appendChild(dd);
     });
   }

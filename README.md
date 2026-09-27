@@ -118,8 +118,10 @@ die Reihenfolge auf der Webseite. Pro Objekt:
 | Produkt-ID | Deine eigene Kennung, z. B. „JB-042". Steht in der Detailansicht, ist über die Suche findbar und landet im Betreff der Anfrage-Mail |
 | NSFW | Bild unscharf, Kennzeichen neben dem Titel |
 | Neu | Grünes Schild „Neu" oben links auf dem Bild |
+| Limited Edition | Goldenes Schild „Limited Edition" |
+| Sale + Rabatt in Prozent | Rotes Schild „-20 %", alter Preis durchgestrichen, neuer daneben – siehe unten |
 | Highlight | Erscheint zusätzlich oben im Abschnitt „Highlights" |
-| Aufkleber | Zweites Schild in der Akzentfarbe: Bestseller, Limitiert, Einzelstück, Auf Anfrage, Nicht verfügbar – kombinierbar mit „Neu" |
+| Aufkleber | Weiteres Schild in gedeckter Farbe: Bestseller, Einzelstück, Auf Anfrage, Nicht verfügbar |
 | Material, Maße, Farben, Druckzeit, Verfügbarkeit, Preis-Hinweis | Landen als Tabelle in der Detailansicht |
 | Weitere Bilder | Werden in der Detailansicht als Miniaturen zum Durchblättern gezeigt |
 
@@ -278,6 +280,34 @@ Deshalb steht in `admin/index.html`:
 **Nach jeder Änderung an `config.yml` die Zahl hochzählen** (`?v=6`, `?v=7`, …). Sonst
 arbeitest du bis zu zehn Minuten mit der alten Fassung weiter und suchst den Fehler an
 der falschen Stelle.
+
+## Rabatte
+
+Schalte beim Objekt **Sale** ein und trag bei **Rabatt in Prozent** eine Zahl ein.
+Dann passiert zweierlei: Auf dem Bild erscheint ein rotes Schild „-20 %", und der
+Preis wird ausgerechnet.
+
+Gerechnet wird mit der **ersten Zahl im Preis-Hinweis**, und sie wird an genau
+derselben Stelle wieder eingesetzt. Alles drumherum bleibt stehen:
+
+| Preis-Hinweis | mit 20 % Rabatt |
+|---|---|
+| `ab 24 EUR` | ~~ab 24 EUR~~ **ab 19,20 EUR** |
+| `39,90 €` | ~~39,90 €~~ **31,92 €** |
+| `100 EUR` | ~~100 EUR~~ **80 EUR** |
+| `Preis auf Anfrage` | unverändert – keine Zahl zum Rechnen |
+
+Glatte Beträge bekommen keine Nachkommastellen, krumme werden auf zwei gerundet
+(deutsche Schreibweise mit Komma).
+
+Zwei Sonderfälle:
+
+* **Sale an, aber kein Prozentsatz** – dann steht nur „Sale" auf dem Bild, der Preis
+  bleibt wie er ist.
+* **Sale an, aber keine Zahl im Preis** – das Schild erscheint, gerechnet wird nichts.
+
+Der Platzhalter `{preis}` in der WhatsApp-Nachricht nimmt automatisch den
+**reduzierten** Preis – also den, zu dem tatsächlich bestellt wird.
 
 ## Bestellung über WhatsApp
 

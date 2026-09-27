@@ -99,6 +99,35 @@ collections:
                   Detailansicht. Einfach wieder ausschalten, wenn das Objekt
                   nicht mehr neu ist.
 
+              - label: Limited Edition
+                name: is_limited
+                widget: boolean
+                default: false
+                required: false
+                hint: An = goldenes Schild "Limited Edition" auf dem Bild.
+
+              - label: Sale
+                name: sale
+                widget: boolean
+                default: false
+                required: false
+                hint: >-
+                  An = roter Rabatt-Aufkleber, und der Preis wird automatisch
+                  heruntergerechnet. Dafür muss unten der Prozentsatz stehen
+                  und beim Preis-Hinweis eine Zahl vorkommen.
+
+              - label: Rabatt in Prozent
+                name: sale_percent
+                widget: number
+                required: false
+                value_type: int
+                min: 1
+                max: 99
+                hint: >-
+                  Nur mit eingeschaltetem Sale wirksam. Beispiel: 20 macht aus
+                  "ab 24 EUR" ein durchgestrichenes "ab 24 EUR" und daneben
+                  "ab 19,20 EUR". Auf dem Bild steht dann "-20 %".
+
               - label: Highlight auf der Startseite
                 name: featured
                 widget: boolean
@@ -112,13 +141,12 @@ collections:
                 required: false
                 options:
                   - Bestseller
-                  - Limitiert
                   - Einzelstück
                   - Auf Anfrage
                   - Nicht verfügbar
                 hint: >-
-                  Zweites Schild neben "Neu", in der Akzentfarbe. Leer lassen
-                  = keins. Beide lassen sich kombinieren.
+                  Zusätzliches Schild in gedeckter Farbe. Leer lassen = keins.
+                  Lässt sich mit den Schaltern oben kombinieren.
 
               - label: Beschreibung
                 name: description

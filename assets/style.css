@@ -35,6 +35,8 @@
   --accent-soft: rgba(224, 58, 69, .14);
   --new: #2fc46f;
   --new-fg: #05180d;
+  --gold: #d9a441;
+  --gold-fg: #1c1305;
 
   --shadow: 0 2px 6px rgba(0,0,0,.45), 0 18px 50px rgba(0,0,0,.55);
   --radius: 4px;
@@ -49,6 +51,8 @@
 html[data-theme="light"] {
   --new: #15914b;
   --new-fg: #ffffff;
+  --gold: #8a6410;
+  --gold-fg: #ffffff;
   --bg: #ffffff;
   --bg-soft: #f4f4f7;
   --bg-elev: #ffffff;
@@ -66,6 +70,8 @@ html[data-theme="light"] {
   html:not([data-theme]) {
     --new: #15914b;
     --new-fg: #ffffff;
+    --gold: #8a6410;
+    --gold-fg: #ffffff;
     --bg: #ffffff;
     --bg-soft: #f4f4f7;
     --bg-elev: #ffffff;
@@ -405,10 +411,14 @@ html[data-theme="light"] .maintenance-logo { filter: invert(1); }
 }
 .badge {
   font-size: .64rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
-  padding: 5px 9px; border-radius: 3px; background: var(--accent); color: var(--accent-fg);
+  padding: 5px 9px; border-radius: 3px;
+  background: rgba(255,255,255,.93); color: #14141a;   /* Bestseller, Einzelstück */
+  backdrop-filter: blur(4px);
 }
+.badge-sale { background: var(--accent); color: var(--accent-fg); }
 .badge-new { background: var(--new); color: var(--new-fg); }
-.badge-muted { background: rgba(0,0,0,.72); color: #fff; backdrop-filter: blur(4px); }
+.badge-limited { background: var(--gold); color: var(--gold-fg); }
+.badge-muted { background: rgba(0,0,0,.72); color: #fff; }
 .badge-outline { background: transparent; border: 1px solid #fff; color: #fff; }
 
 .card-body { padding: 16px 16px 20px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
@@ -430,6 +440,13 @@ html[data-theme="light"] .maintenance-logo { filter: invert(1); }
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
 }
 .card-price { font-size: .86rem; font-weight: 800; color: var(--fg); }
+
+/* Alter Preis durchgestrichen, neuer in der Akzentfarbe daneben. */
+.price-old {
+  color: var(--fg-dim); text-decoration: line-through;
+  font-weight: 500; margin-right: 8px;
+}
+.price-new { color: var(--accent); font-weight: 800; }
 .card-meta { font-size: .72rem; color: var(--fg-dim); letter-spacing: .04em; }
 
 /* ---------- NSFW ---------- */
