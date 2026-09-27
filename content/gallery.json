@@ -21,6 +21,31 @@
       "featured": true,
       "image": "/images/uploads/bild_2026-08-02_180623977.png",
       "title": "Placeholder"
+    },
+    {
+      "badge": "Auf Anfrage",
+      "is_limited": true,
+      "sale": false,
+      "price_note": "20€",
+      "is_new": true,
+      "product_id": "123456",
+      "featured": true,
+      "nsfw": false,
+      "title": "Placeholder 3",
+      "image": "/images/uploads/bild_2026-08-02_180623977.png",
+      "category": "Comic"
+    },
+    {
+      "is_limited": false,
+      "sale": true,
+      "price_note": "100€",
+      "is_new": false,
+      "sale_percent": 25,
+      "featured": false,
+      "nsfw": false,
+      "title": "Placeholder 4",
+      "image": "/images/uploads/bild_2026-08-02_180623977.png",
+      "category": "Ersatzteil"
     }
   ]
 }
