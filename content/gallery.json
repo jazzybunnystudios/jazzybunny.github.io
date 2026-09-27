@@ -4,7 +4,7 @@
       "size": "Placeholder",
       "badge": "Auf Anfrage",
       "material": "Placeholder",
-      "price_note": "Placeholder",
+      "price_note": "2000",
       "is_new": true,
       "featured": false,
       "colors": "Placeholder",
@@ -20,13 +20,14 @@
       "nsfw": true,
       "featured": true,
       "image": "/images/uploads/bild_2026-08-02_180623977.png",
-      "title": "Placeholder"
+      "title": "Placeholder",
+      "price_note": "12.22"
     },
     {
       "badge": "Auf Anfrage",
       "is_limited": true,
       "sale": false,
-      "price_note": "20€",
+      "price_note": "21.99",
       "is_new": true,
       "product_id": "123456",
       "featured": true,
@@ -38,7 +39,7 @@
     {
       "is_limited": false,
       "sale": true,
-      "price_note": "100€",
+      "price_note": "100",
       "is_new": false,
       "sale_percent": 25,
       "featured": false,
