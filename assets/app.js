@@ -458,6 +458,13 @@
     { id: 'limited',    sektion: '#row-limited',    gitter: '#limited-grid',    test: function (i) { return !!i.is_limited; } }
   ];
 
+  var SAMMLUNG_NAMEN = {
+    neu: 'Neu eingetroffen',
+    highlight: 'Highlights',
+    bestseller: 'Bestseller',
+    limited: 'Limited Edition'
+  };
+
   function reihenTest(id) {
     for (var i = 0; i < REIHEN.length; i++) if (REIHEN[i].id === id) return REIHEN[i].test;
     return null;
@@ -550,8 +557,45 @@
   /* ---------- Produktseite ---------- */
   function initShop() {
     leseAdresse();
+    buildCollections();
     buildFilters();
     verdrahteFilter();
+    applyView();
+  }
+
+  /** "Auswahl"-Block: dieselben Sammlungen wie die Reihen der Startseite. */
+  function buildCollections() {
+    var box = $('#collections');
+    if (!box) return;
+
+    var vorhanden = REIHEN.filter(function (r) { return allItems.some(r.test); });
+    if (!vorhanden.length) return;
+
+    var eintraege = [{ id: '', label: 'Alle' }].concat(vorhanden.map(function (r) {
+      return { id: r.id, label: SAMMLUNG_NAMEN[r.id] || r.id };
+    }));
+
+    eintraege.forEach(function (e) {
+      var b = el('button', 'side-cat');
+      b.type = 'button';
+      b.textContent = e.label;
+      b.dataset.sammlung = e.id;
+      b.setAttribute('aria-pressed', e.id === schnellFilter ? 'true' : 'false');
+      b.addEventListener('click', function () { setSammlung(e.id); });
+      box.appendChild(b);
+    });
+
+    show($('#side-collections'), true);
+  }
+
+  function setSammlung(id) {
+    schnellFilter = id;
+    var box = $('#collections');
+    if (box) {
+      Array.prototype.forEach.call(box.children, function (c) {
+        c.setAttribute('aria-pressed', c.dataset.sammlung === id ? 'true' : 'false');
+      });
+    }
     applyView();
   }
 
@@ -656,6 +700,7 @@
     if ($('#price-max')) $('#price-max').value = '';
     if ($('#sort-select')) $('#sort-select').value = 'default';
 
+    setSammlung('');
     setCategory('Alle');
   }
 
@@ -737,19 +782,13 @@
     box.textContent = '';
     if (!schnellFilter) { show(box, false); return; }
 
-    var namen = { neu: 'Neu eingetroffen', highlight: 'Highlights',
-                  bestseller: 'Bestseller', limited: 'Limited Edition' };
-
     var chip = el('button', 'filter-chip');
     chip.type = 'button';
-    chip.appendChild(document.createTextNode(namen[schnellFilter] || schnellFilter));
+    chip.appendChild(document.createTextNode(SAMMLUNG_NAMEN[schnellFilter] || schnellFilter));
     var x = el('span', 'filter-x');
     x.textContent = '\u00d7';
     chip.appendChild(x);
-    chip.addEventListener('click', function () {
-      schnellFilter = '';
-      applyView();
-    });
+    chip.addEventListener('click', function () { setSammlung(''); });
 
     box.appendChild(chip);
     show(box, true);

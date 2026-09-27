@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Alle Produkte – JazzyBunny Studios">
 <meta property="og:description" content="Galerie für individuelle 3D-Druck Objekte">
-<link rel="stylesheet" href="assets/style.css?v=11">
+<link rel="stylesheet" href="assets/style.css?v=13">
 <link rel="icon" type="image/png" href="assets/favicon.png?v=2">
 </head>
 <body class="booting">
@@ -80,6 +80,11 @@
       <div class="side-block">
         <label class="side-label" for="search-input">Suche</label>
         <input type="search" id="search-input" placeholder="Name, Kategorie, Material …" autocomplete="off">
+      </div>
+
+      <div class="side-block" id="side-collections" hidden>
+        <span class="side-label">Auswahl</span>
+        <div id="collections" class="side-cats" role="group" aria-label="Nach Auswahl filtern"></div>
       </div>
 
       <div class="side-block" id="side-cats" hidden>
@@ -236,6 +241,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=14"></script>
+<script src="assets/app.js?v=15"></script>
 </body>
 </html>

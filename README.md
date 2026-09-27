@@ -180,6 +180,9 @@ gar nicht erst – genau wie Kategorien, Kennzahlen und FAQ.
 Das komplette Sortiment mit Filterspalte:
 
 * **Suche** über Titel, Beschreibung, Kategorie, Material, Farben und Produkt-ID
+* **Auswahl** – dieselben Sammlungen wie die Reihen der Startseite: Neu eingetroffen,
+  Highlights, Bestseller, Limited Edition. Es erscheinen nur die, zu denen es auch
+  Objekte gibt
 * **Kategorien** als Liste
 * **NSFW ausblenden** – blendet markierte Objekte ganz aus, statt sie nur unscharf
   zu zeigen
@@ -195,8 +198,10 @@ der Startseite:
 | `produkte.html?filter=neu` | nur neue Objekte (auch `highlight`, `bestseller`, `limited`) |
 | `produkte.html?q=vase` | Suchbegriff vorgegeben |
 
-Bei einem Filter aus der Adresszeile erscheint über dem Raster eine Schaltfläche,
-die ihn mit einem Klick wieder entfernt.
+Auswahl und Kategorie wirken zusammen: „Bestseller" plus „Figuren" zeigt nur Objekte,
+auf die beides zutrifft. Ist eine Auswahl aktiv – ob über die Adresszeile oder von
+Hand –, erscheint über dem Raster eine Schaltfläche, die sie mit einem Klick wieder
+entfernt.
 
 Die **Detailansicht** ist auf beiden Seiten dieselbe: großes Bild, Miniaturen,
 Schilder, Angaben-Tabelle und Bestellknopf; blättern per Pfeiltasten, Wischen oder
