@@ -152,18 +152,54 @@ ausgeliefert und die Änderung ist live.
 
 ---
 
-## Was Besucher sehen
+## Die beiden Seiten
 
-Ankündigungsleiste (wegklickbar) → klebende Kopfzeile mit Menü, Suche und
-Hell/Dunkel-Umschalter → Bühne mit Logo und Knöpfen → Kennzahlen → Kategorie-Kacheln
-→ Highlights → Galerie mit Filter, Suche und Sortierung → FAQ → Kontakt → Fußzeile.
+Die Webseite besteht aus zwei Dateien. Beide teilen sich Kopfzeile, Fußzeile,
+Detailansicht, Design und Skript.
 
-Abschnitte ohne Inhalt erscheinen gar nicht erst. Mit einem einzigen Objekt ohne
-Kategorie bleibt also nur Bühne, Galerie und Kontakt übrig.
+### Startseite (`index.html`)
 
-Die **Suche** (Lupe in der Kopfzeile) durchsucht Titel, Beschreibung, Kategorie,
-Material und Farben. Die **Detailansicht** zeigt großes Bild, Miniaturen, Aufkleber,
-Angaben-Tabelle und den Anfrage-Knopf; blättern geht per Pfeiltasten, Wischen oder
+Ankündigungsleiste → Kopfzeile → Bühne → Kennzahlen → Kategorie-Kacheln → vier
+kuratierte Reihen → Wegweiser → FAQ → Kontakt → Fußzeile.
+
+Die vier Reihen füllen sich von allein aus den Schaltern am Objekt:
+
+| Reihe | zeigt Objekte mit |
+|---|---|
+| Neu eingetroffen | Schalter **Neu** |
+| Highlights | Schalter **Highlight auf der Startseite** |
+| Bestseller | Aufkleber **Bestseller** |
+| Limited Edition | Schalter **Limited Edition** |
+
+Jede Reihe zeigt höchstens **vier** Objekte und daneben „Alle ansehen", das auf die
+Produktseite mit genau diesem Filter führt. Reihen ohne passende Objekte erscheinen
+gar nicht erst – genau wie Kategorien, Kennzahlen und FAQ.
+
+### Produktseite (`produkte.html`)
+
+Das komplette Sortiment mit Filterspalte:
+
+* **Suche** über Titel, Beschreibung, Kategorie, Material, Farben und Produkt-ID
+* **Kategorien** als Liste
+* **NSFW ausblenden** – blendet markierte Objekte ganz aus, statt sie nur unscharf
+  zu zeigen
+* **Preis von/bis** – rechnet mit dem reduzierten Preis, Objekte ohne Zahl fallen raus
+* **Sortierung**: Empfohlen, Name A–Z, Z–A, Preis auf- und absteigend
+
+Die Seite versteht Parameter in der Adresse, darüber funktionieren die Verweise von
+der Startseite:
+
+| Adresse | Wirkung |
+|---|---|
+| `produkte.html?kategorie=Deko` | Kategorie vorgewählt |
+| `produkte.html?filter=neu` | nur neue Objekte (auch `highlight`, `bestseller`, `limited`) |
+| `produkte.html?q=vase` | Suchbegriff vorgegeben |
+
+Bei einem Filter aus der Adresszeile erscheint über dem Raster eine Schaltfläche,
+die ihn mit einem Klick wieder entfernt.
+
+Die **Detailansicht** ist auf beiden Seiten dieselbe: großes Bild, Miniaturen,
+Schilder, Angaben-Tabelle und Bestellknopf; blättern per Pfeiltasten, Wischen oder
 den Knöpfen im Bild.
 
 ---
@@ -195,7 +231,8 @@ in der Config; auf der Live-Seite wird die Einstellung ignoriert.
 ## Dateien
 
 ```
-index.html              Aufbau der Seite
+index.html              Startseite mit den kuratierten Reihen
+produkte.html           Produktseite mit Filterspalte
 assets/style.css        Design (dunkel als Standard, heller Modus per Umschalter)
 assets/app.js           Lädt die JSON-Dateien und baut daraus die Seite
 assets/wordmark.webp    Wortmarke (Kopfzeile, Fußzeile, Sperrseite)

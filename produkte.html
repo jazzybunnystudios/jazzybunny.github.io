@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JazzyBunny Studios</title>
-<meta name="description" content="JazzyBunny Studios – Galerie für individuelle 3D-Druck Objekte">
+<title>Alle Produkte – JazzyBunny Studios</title>
+<meta name="description" content="Alle Produkte von JazzyBunny Studios – Suche, Kategorien und Preisfilter">
 <meta name="theme-color" content="#08080b">
 <meta property="og:type" content="website">
-<meta property="og:title" content="JazzyBunny Studios">
+<meta property="og:title" content="Alle Produkte – JazzyBunny Studios">
 <meta property="og:description" content="Galerie für individuelle 3D-Druck Objekte">
 <link rel="stylesheet" href="assets/style.css?v=10">
 <link rel="icon" type="image/png" href="assets/favicon.png?v=2">
@@ -38,15 +38,16 @@
       <span class="burger" aria-hidden="true"></span>
     </button>
 
-    <a class="brand" href="#top">
+    <a class="brand" href="index.html">
       <img class="brand-logo" id="brand-logo" src="assets/wordmark.webp" alt="JazzyBunny Studios" width="900" height="85">
     </a>
 
     <nav class="main-nav" id="main-nav">
-      <a href="produkte.html">Produkte</a>
-      <a href="#kategorien" data-nav="kategorien" hidden>Kategorien</a>
-      <a href="#faq" data-nav="faq" hidden>FAQ</a>
-      <a href="#kontakt">Kontakt</a>
+      <a href="index.html">Start</a>
+      <a href="produkte.html" aria-current="page">Produkte</a>
+      <a href="index.html#kategorien" data-nav="kategorien" hidden>Kategorien</a>
+      <a href="index.html#faq" data-nav="faq" hidden>FAQ</a>
+      <a href="index.html#kontakt">Kontakt</a>
     </nav>
 
     <div class="header-actions">
@@ -67,103 +68,87 @@
 </header>
 
 <main id="top">
+  <div class="wrap page-head">
+    <nav class="breadcrumb" aria-label="Pfad">
+      <a href="index.html">Start</a><span aria-hidden="true">/</span><span>Produkte</span>
+    </nav>
+    <h1 id="shop-title">Alle Produkte</h1>
+  </div>
 
-  <!-- Bühne -->
-  <section class="hero" id="hero">
-    <div class="hero-bg" id="hero-bg" hidden></div>
-    <div class="wrap hero-inner">
-      <span class="hero-kicker" id="hero-kicker"></span>
-      <h1 id="hero-title" data-site="title">JazzyBunny Studios</h1>
-      <p class="hero-sub" id="hero-sub"></p>
-      <div class="hero-actions" id="hero-actions">
-        <a class="btn btn-primary" id="hero-cta" href="produkte.html">Alle Produkte</a>
-        <a class="btn btn-ghost" href="#kontakt">Anfrage stellen</a>
+  <div class="wrap shop">
+    <aside class="shop-side">
+      <div class="side-block">
+        <label class="side-label" for="search-input">Suche</label>
+        <input type="search" id="search-input" placeholder="Name, Kategorie, Material …" autocomplete="off">
+      </div>
+
+      <div class="side-block" id="side-cats" hidden>
+        <span class="side-label">Kategorien</span>
+        <div id="filters" class="side-cats" role="group" aria-label="Nach Kategorie filtern"></div>
+      </div>
+
+      <div class="side-block">
+        <span class="side-label">Inhalt</span>
+        <label class="check">
+          <input type="checkbox" id="nsfw-toggle">
+          <span>NSFW ausblenden</span>
+        </label>
+      </div>
+
+      <div class="side-block">
+        <span class="side-label">Preis</span>
+        <div class="price-range">
+          <input type="number" id="price-min" placeholder="von" min="0" inputmode="numeric">
+          <span aria-hidden="true">—</span>
+          <input type="number" id="price-max" placeholder="bis" min="0" inputmode="numeric">
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-ghost side-reset" id="reset-filters">Filter zurücksetzen</button>
+    </aside>
+
+    <div class="shop-main">
+      <div class="shop-bar">
+        <span class="result-count" id="result-count"></span>
+        <label class="sort">
+          <span class="visually-hidden">Sortierung</span>
+          <select id="sort-select">
+            <option value="default">Empfohlen</option>
+            <option value="az">Name A–Z</option>
+            <option value="za">Name Z–A</option>
+            <option value="preis-auf">Preis aufsteigend</option>
+            <option value="preis-ab">Preis absteigend</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="active-filter" class="active-filter" hidden></div>
+
+      <div id="grid" class="grid" aria-live="polite"></div>
+
+      <div id="state-loading" class="state">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Produkte werden geladen …</p>
+      </div>
+
+      <div id="state-empty" class="state" hidden>
+        <h3>Noch keine Produkte</h3>
+        <p>Melde dich im Admin-Bereich an und lade dein erstes Bild hoch.</p>
+        <a class="btn btn-primary" href="admin/">Zum Admin-Bereich</a>
+      </div>
+
+      <div id="state-nohits" class="state" hidden>
+        <h3>Nichts gefunden</h3>
+        <p>Für diese Auswahl gibt es kein passendes Produkt.</p>
+        <button type="button" class="btn btn-ghost" id="reset-search">Filter zurücksetzen</button>
+      </div>
+
+      <div id="state-error" class="state" hidden>
+        <h3>Produkte konnten nicht geladen werden</h3>
+        <p><code>content/gallery.json</code> ist nicht erreichbar oder fehlerhaft.</p>
       </div>
     </div>
-  </section>
-
-  <!-- Kennzahlen -->
-  <section class="strip" id="strip" hidden>
-    <div class="wrap strip-inner" id="strip-inner"></div>
-  </section>
-
-  <!-- Kategorien -->
-  <section class="section" id="kategorien" hidden>
-    <div class="wrap">
-      <h2 class="section-title" id="cat-title">Kategorien</h2>
-      <div class="cat-grid" id="cat-grid"></div>
-    </div>
-  </section>
-
-  <!-- Kuratierte Reihen: erscheinen nur, wenn es passende Objekte gibt -->
-  <section class="section section-alt row-section" id="row-neu" hidden>
-    <div class="wrap">
-      <div class="row-head">
-        <h2 class="section-title" id="neu-title">Neu eingetroffen</h2>
-        <a class="row-more" href="produkte.html?filter=neu">Alle ansehen</a>
-      </div>
-      <div class="grid grid-row" id="neu-grid"></div>
-    </div>
-  </section>
-
-  <section class="section row-section" id="row-highlights" hidden>
-    <div class="wrap">
-      <div class="row-head">
-        <h2 class="section-title" id="featured-title">Highlights</h2>
-        <a class="row-more" href="produkte.html?filter=highlight">Alle ansehen</a>
-      </div>
-      <div class="grid grid-row" id="featured-grid"></div>
-    </div>
-  </section>
-
-  <section class="section section-alt row-section" id="row-bestseller" hidden>
-    <div class="wrap">
-      <div class="row-head">
-        <h2 class="section-title" id="bestseller-title">Bestseller</h2>
-        <a class="row-more" href="produkte.html?filter=bestseller">Alle ansehen</a>
-      </div>
-      <div class="grid grid-row" id="bestseller-grid"></div>
-    </div>
-  </section>
-
-  <section class="section row-section" id="row-limited" hidden>
-    <div class="wrap">
-      <div class="row-head">
-        <h2 class="section-title" id="limited-title">Limited Edition</h2>
-        <a class="row-more" href="produkte.html?filter=limited">Alle ansehen</a>
-      </div>
-      <div class="grid grid-row" id="limited-grid"></div>
-    </div>
-  </section>
-
-  <!-- Wegweiser zur vollstaendigen Produktseite -->
-  <section class="section alles-section" id="alles">
-    <div class="wrap">
-      <h2 class="section-title" id="alles-title">Alle Produkte</h2>
-      <p class="alles-text" id="alles-text">Das komplette Sortiment mit Suche, Kategorien und Preisfilter.</p>
-      <a class="btn btn-primary" href="produkte.html">Zur Produktseite</a>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="section section-alt" id="faq" hidden>
-    <div class="wrap wrap-narrow">
-      <h2 class="section-title" id="faq-title">Häufige Fragen</h2>
-      <div class="faq-list" id="faq-list"></div>
-    </div>
-  </section>
-
-  <!-- Kontakt -->
-  <section class="section contact" id="kontakt">
-    <div class="wrap wrap-narrow">
-      <h2 class="section-title" id="contact-title">Kontakt</h2>
-      <p class="contact-lead" id="contact-lead">Interesse an einem Objekt oder einer eigenen Idee? Schreib mir gerne.</p>
-      <div id="contact-links" class="contact-links"></div>
-
-      <!-- Discord-Widget, wird aus den Einstellungen befüllt -->
-      <div id="discord-box" class="discord-box" hidden></div>
-    </div>
-  </section>
+  </div>
 </main>
 
 <footer class="site-footer">
@@ -174,9 +159,9 @@
     </div>
     <div class="footer-col">
       <h4>Entdecken</h4>
-      <a href="produkte.html">Alle Produkte</a>
-      <a href="#kategorien" data-nav="kategorien" hidden>Kategorien</a>
-      <a href="#faq" data-nav="faq" hidden>FAQ</a>
+      <a href="index.html">Start</a>
+      <a href="index.html#kategorien" data-nav="kategorien" hidden>Kategorien</a>
+      <a href="index.html#faq" data-nav="faq" hidden>FAQ</a>
     </div>
     <div class="footer-col">
       <h4>Kontakt</h4>
@@ -216,7 +201,7 @@
       <div class="badges" id="lb-badges"></div>
       <p id="lb-desc"></p>
       <dl class="spec" id="lb-spec"></dl>
-      <a class="btn btn-primary lb-cta" id="lb-cta" href="#kontakt"><span>Nach diesem Objekt fragen</span></a>
+      <a class="btn btn-primary lb-cta" id="lb-cta" href="index.html#kontakt"><span>Nach diesem Objekt fragen</span></a>
     </div>
   </div>
 </div>

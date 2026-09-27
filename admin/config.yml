@@ -283,17 +283,50 @@ collections:
             required: false
             default: Kategorien
 
+          - label: Überschrift "Neu eingetroffen"
+            name: new_title
+            widget: string
+            required: false
+            default: Neu eingetroffen
+            hint: >-
+              Reihe mit allen Objekten, bei denen der Schalter "Neu" an ist.
+              Gibt es keine, verschwindet der ganze Abschnitt.
+
           - label: Überschrift "Highlights"
             name: featured_title
             widget: string
             required: false
             default: Highlights
+            hint: Reihe mit den Objekten, bei denen "Highlight auf der Startseite" an ist.
 
-          - label: Überschrift "Galerie"
-            name: catalog_title
+          - label: Überschrift "Bestseller"
+            name: bestseller_title
             widget: string
             required: false
-            default: Galerie
+            default: Bestseller
+            hint: Reihe mit allen Objekten, die den Aufkleber "Bestseller" tragen.
+
+          - label: Überschrift "Limited Edition"
+            name: limited_title
+            widget: string
+            required: false
+            default: Limited Edition
+            hint: Reihe mit allen Objekten, bei denen "Limited Edition" an ist.
+
+          - label: Überschrift Produktseite
+            name: shop_title
+            widget: string
+            required: false
+            default: Alle Produkte
+            hint: >-
+              Titel der Unterseite mit dem kompletten Sortiment – und zugleich
+              die Überschrift des Wegweisers unten auf der Startseite.
+
+          - label: Text des Wegweisers
+            name: shop_text
+            widget: text
+            required: false
+            hint: Kurzer Satz unter "Alle Produkte" am Ende der Startseite.
 
           # --- FAQ ---
           - label: Überschrift "FAQ"

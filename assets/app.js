@@ -187,7 +187,8 @@
 
   function buildDiscord(s) {
     var raw = String(s.discord || '').trim();
-    if (!raw) return;
+    // Den Kasten gibt es nur auf der Startseite.
+    if (!raw || !$('#discord-box')) return;
 
     discordId = discordServerId(raw);
 
@@ -351,9 +352,10 @@
   /* ================= Startseite ================= */
 
   function applyHome(h, s) {
-    // Bühne
-    if (h.hero_image) {
-      var bg = $('#hero-bg');
+    // Die Bühne gibt es nur auf der Startseite – auf der Produktseite
+    // fehlen diese Elemente, deshalb überall vorher prüfen.
+    var bg = $('#hero-bg');
+    if (h.hero_image && bg) {
       bg.style.backgroundImage = 'url("' + mediaUrl(h.hero_image) + '")';
       show(bg, true);
       document.body.classList.add('has-hero-bg');
@@ -364,24 +366,42 @@
     txt($('#hero-sub'), h.hero_subtitle || s.about || '');
 
     var cta = $('#hero-cta');
-    if (h.hero_cta_text) txt(cta, h.hero_cta_text);
-    if (h.hero_cta_link) cta.href = h.hero_cta_link;
+    if (cta) {
+      if (h.hero_cta_text) txt(cta, h.hero_cta_text);
+      // Anker nur übernehmen, wenn es das Ziel auf dieser Seite auch gibt –
+      // sonst bliebe ein alter Wert wie "#katalog" als toter Link stehen.
+      if (h.hero_cta_link && zielVorhanden(h.hero_cta_link)) cta.href = h.hero_cta_link;
+    }
 
-    // Abschnittstitel
-    if (h.cat_title) txt($('#cat-title'), h.cat_title);
-    if (h.featured_title) txt($('#featured-title'), h.featured_title);
-    if (h.catalog_title) txt($('#catalog-title'), h.catalog_title);
-    if (h.faq_title) txt($('#faq-title'), h.faq_title);
-    if (h.contact_title) txt($('#contact-title'), h.contact_title);
-    if (h.contact_text) txt($('#contact-lead'), h.contact_text);
+    // Abschnittstitel – jedes Feld wirkt nur, wenn die Seite ihn hat
+    [['#cat-title', h.cat_title],
+     ['#neu-title', h.new_title],
+     ['#featured-title', h.featured_title],
+     ['#bestseller-title', h.bestseller_title],
+     ['#limited-title', h.limited_title],
+     ['#alles-title', h.shop_title],
+     ['#shop-title', h.shop_title],
+     ['#alles-text', h.shop_text],
+     ['#faq-title', h.faq_title],
+     ['#contact-title', h.contact_title],
+     ['#contact-lead', h.contact_text]
+    ].forEach(function (paar) {
+      if (paar[1]) txt($(paar[0]), paar[1]);
+    });
 
     renderStats(h.stats);
     renderFaq(h.faq);
   }
 
+  function zielVorhanden(link) {
+    if (link.charAt(0) !== '#') return true;         // externe Adresse oder andere Seite
+    return !!document.querySelector(link);
+  }
+
   function renderStats(stats) {
     if (!Array.isArray(stats) || !stats.length) return;
     var box = $('#strip-inner');
+    if (!box) return;
     stats.forEach(function (s) {
       if (!s || (!s.value && !s.label)) return;
       var item = el('div', 'strip-item');
@@ -396,6 +416,7 @@
   function renderFaq(faq) {
     if (!Array.isArray(faq) || !faq.length) return;
     var list = $('#faq-list');
+    if (!list) return;
     faq.forEach(function (f) {
       if (!f || !f.question) return;
       var d = el('details', 'faq-item');
@@ -412,13 +433,35 @@
     }
   }
 
-  /* ================= Galerie ================= */
+  /* ================= Produkte ================= */
+
+  // Eine Datei bedient beide Seiten. Welche gerade laeuft, verraet das Markup:
+  // die Produktseite hat die Filterspalte, die Startseite die Reihen.
+  var istShop = !!$('.shop-side');
 
   var allItems = [];
   var visibleItems = [];
   var activeCategory = 'Alle';
   var searchTerm = '';
   var sortMode = 'default';
+  var nsfwAus = false;
+  var preisVon = null;
+  var preisBis = null;
+  var schnellFilter = '';          // neu | highlight | bestseller | limited
+
+  var REIHEN_MAX = 4;              // Objekte pro Reihe auf der Startseite
+
+  var REIHEN = [
+    { id: 'neu',        sektion: '#row-neu',        gitter: '#neu-grid',        test: function (i) { return !!i.is_new; } },
+    { id: 'highlight',  sektion: '#row-highlights', gitter: '#featured-grid',   test: function (i) { return !!i.featured; } },
+    { id: 'bestseller', sektion: '#row-bestseller', gitter: '#bestseller-grid', test: function (i) { return /bestseller/i.test(i.badge || ''); } },
+    { id: 'limited',    sektion: '#row-limited',    gitter: '#limited-grid',    test: function (i) { return !!i.is_limited; } }
+  ];
+
+  function reihenTest(id) {
+    for (var i = 0; i < REIHEN.length; i++) if (REIHEN[i].id === id) return REIHEN[i].test;
+    return null;
+  }
 
   function loadGallery() {
     loadJSON('content/gallery.json').then(function (data) {
@@ -426,12 +469,11 @@
       allItems = (data && Array.isArray(data.items) ? data.items : []).filter(function (it) {
         return it && it.image;
       });
+
       if (!allItems.length) { show($('#state-empty'), true); return; }
 
-      buildFilters();
       renderCategories();
-      renderFeatured();
-      applyView();
+      if (istShop) initShop(); else renderReihen();
     }).catch(function (err) {
       console.error(err);
       show($('#state-loading'), false);
@@ -459,52 +501,36 @@
     return list;
   }
 
-  /* ---------- Filterleiste ---------- */
-  function buildFilters() {
-    var cats = categoriesOf();
-    if (cats.length < 2) return;
-
-    var bar = $('#filters');
-    ['Alle'].concat(cats).forEach(function (label) {
-      var b = el('button', 'chip');
-      b.type = 'button';
-      b.textContent = label;
-      b.dataset.cat = label;
-      b.setAttribute('aria-pressed', label === 'Alle' ? 'true' : 'false');
-      b.addEventListener('click', function () { setCategory(label); });
-      bar.appendChild(b);
+  /* ---------- Startseite: kuratierte Reihen ---------- */
+  function renderReihen() {
+    REIHEN.forEach(function (r) {
+      var treffer = allItems.filter(r.test);
+      if (!treffer.length) return;
+      fillGrid($(r.gitter), treffer.slice(0, REIHEN_MAX));
+      show($(r.sektion), true);
     });
-    show(bar, true);
-  }
-
-  function setCategory(label) {
-    activeCategory = label;
-    Array.prototype.forEach.call($('#filters').children, function (c) {
-      c.setAttribute('aria-pressed', c.dataset.cat === label ? 'true' : 'false');
-    });
-    applyView();
   }
 
   /* ---------- Kategorie-Kacheln ---------- */
   function renderCategories() {
+    var box = $('#cat-grid');
+    if (!box) return;
+
     var cats = categoriesOf();
     if (cats.length < 2) return;
 
-    var box = $('#cat-grid');
     cats.forEach(function (cat) {
       var members = allItems.filter(function (it) { return (it.category || '').trim() === cat; });
-      var cover = members[0];
-
-      var tile = el('button', 'cat-tile');
-      tile.type = 'button';
+      var tile = el('a', 'cat-tile');
+      tile.href = 'produkte.html?kategorie=' + encodeURIComponent(cat);
 
       var img = el('img');
-      img.src = mediaUrl(cover.image);
+      img.src = mediaUrl(members[0].image);
       img.alt = '';
       img.loading = 'lazy';
       tile.appendChild(img);
 
-      // Verdeckte Objekte sollen auch als Kachelbild nicht offen liegen.
+      // Sind alle Objekte der Kategorie verdeckt, bleibt auch die Kachel unscharf.
       if (members.every(function (m) { return m.nsfw; })) tile.classList.add('is-blurred');
 
       var label = el('span', 'cat-label');
@@ -514,12 +540,6 @@
       label.appendChild(count);
       tile.appendChild(label);
 
-      tile.addEventListener('click', function () {
-        setCategory(cat);
-        var target = document.getElementById('katalog');
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-      });
-
       box.appendChild(tile);
     });
 
@@ -527,20 +547,150 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-nav="kategorien"]'), function (n) { n.hidden = false; });
   }
 
-  /* ---------- Highlights ---------- */
-  function renderFeatured() {
-    var picks = allItems.filter(function (it) { return it.featured; });
-    if (!picks.length) return;
-    fillGrid($('#featured-grid'), picks);
-    show($('#highlights'), true);
+  /* ---------- Produktseite ---------- */
+  function initShop() {
+    leseAdresse();
+    buildFilters();
+    verdrahteFilter();
+    applyView();
+  }
+
+  /** Vorauswahl aus der Adresszeile: ?kategorie= , ?filter= , ?q= */
+  function leseAdresse() {
+    var p = new URLSearchParams(location.search);
+
+    var kat = p.get('kategorie');
+    if (kat) activeCategory = kat;
+
+    var f = p.get('filter');
+    if (f && reihenTest(f)) schnellFilter = f;
+
+    var q = p.get('q');
+    if (q) {
+      searchTerm = q;
+      if ($('#search-input')) $('#search-input').value = q;
+    }
+  }
+
+  function buildFilters() {
+    var bar = $('#filters');
+    if (!bar) return;
+
+    var cats = categoriesOf();
+    if (cats.length < 2) return;
+
+    ['Alle'].concat(cats).forEach(function (label) {
+      var b = el('button', 'side-cat');
+      b.type = 'button';
+      b.textContent = label;
+      b.dataset.cat = label;
+      b.setAttribute('aria-pressed', label === activeCategory ? 'true' : 'false');
+      b.addEventListener('click', function () { setCategory(label); });
+      bar.appendChild(b);
+    });
+    show($('#side-cats'), true);
+  }
+
+  function setCategory(label) {
+    activeCategory = label;
+    var bar = $('#filters');
+    if (bar) {
+      Array.prototype.forEach.call(bar.children, function (c) {
+        c.setAttribute('aria-pressed', c.dataset.cat === label ? 'true' : 'false');
+      });
+    }
+    applyView();
+  }
+
+  function verdrahteFilter() {
+    var suche = $('#search-input');
+    if (suche) {
+      suche.addEventListener('input', function () {
+        searchTerm = suche.value.trim();
+        applyView();
+      });
+    }
+
+    var nsfw = $('#nsfw-toggle');
+    if (nsfw) {
+      nsfw.addEventListener('change', function () {
+        nsfwAus = nsfw.checked;
+        applyView();
+      });
+    }
+
+    [['#price-min', 'von'], ['#price-max', 'bis']].forEach(function (paar) {
+      var feld = $(paar[0]);
+      if (!feld) return;
+      feld.addEventListener('input', function () {
+        var v = parseFloat(feld.value);
+        var gueltig = isFinite(v) && v >= 0 ? v : null;
+        if (paar[1] === 'von') preisVon = gueltig; else preisBis = gueltig;
+        applyView();
+      });
+    });
+
+    var sortieren = $('#sort-select');
+    if (sortieren) {
+      sortieren.addEventListener('change', function (e) {
+        sortMode = e.target.value;
+        applyView();
+      });
+    }
+
+    [$('#reset-filters'), $('#reset-search')].forEach(function (knopf) {
+      if (knopf) knopf.addEventListener('click', alleFilterZuruecksetzen);
+    });
+  }
+
+  function alleFilterZuruecksetzen() {
+    searchTerm = '';
+    schnellFilter = '';
+    nsfwAus = false;
+    preisVon = preisBis = null;
+    sortMode = 'default';
+
+    if ($('#search-input')) $('#search-input').value = '';
+    if ($('#nsfw-toggle')) $('#nsfw-toggle').checked = false;
+    if ($('#price-min')) $('#price-min').value = '';
+    if ($('#price-max')) $('#price-max').value = '';
+    if ($('#sort-select')) $('#sort-select').value = 'default';
+
+    setCategory('Alle');
+  }
+
+  /** Zahlenwert eines Objekts fuer Preisfilter und -sortierung, sonst null. */
+  function preisWert(item) {
+    var text = reducedPrice(item) || priceLabel(item.price_note);
+    var m = String(text).match(/\d[\d.,]*/);
+    if (!m) return null;
+    var v = parseNumber(m[0]);
+    return isFinite(v) ? v : null;
   }
 
   /* ---------- Suche, Filter, Sortierung ---------- */
   function applyView() {
     var list = allItems.slice();
 
+    if (schnellFilter) {
+      var test = reihenTest(schnellFilter);
+      if (test) list = list.filter(test);
+    }
+
     if (activeCategory !== 'Alle') {
       list = list.filter(function (it) { return (it.category || '').trim() === activeCategory; });
+    }
+
+    if (nsfwAus) list = list.filter(function (it) { return !it.nsfw; });
+
+    if (preisVon !== null || preisBis !== null) {
+      list = list.filter(function (it) {
+        var v = preisWert(it);
+        if (v === null) return false;                    // ohne Preis kein Treffer
+        if (preisVon !== null && v < preisVon) return false;
+        if (preisBis !== null && v > preisBis) return false;
+        return true;
+      });
     }
 
     if (searchTerm) {
@@ -551,19 +701,58 @@
       });
     }
 
-    if (sortMode === 'az' || sortMode === 'za') {
-      list.sort(function (a, b) {
-        var r = String(a.title || '').localeCompare(String(b.title || ''), 'de');
-        return sortMode === 'az' ? r : -r;
-      });
-    }
+    sortiere(list);
 
     visibleItems = list;
     fillGrid($('#grid'), list);
 
     var n = list.length;
-    txt($('#result-count'), n + (n === 1 ? ' Objekt' : ' Objekte'));
+    txt($('#result-count'), n + (n === 1 ? ' Produkt' : ' Produkte'));
     show($('#state-nohits'), n === 0);
+    zeigeSchnellFilter();
+  }
+
+  function sortiere(list) {
+    if (sortMode === 'az' || sortMode === 'za') {
+      list.sort(function (a, b) {
+        var r = String(a.title || '').localeCompare(String(b.title || ''), 'de');
+        return sortMode === 'az' ? r : -r;
+      });
+    } else if (sortMode === 'preis-auf' || sortMode === 'preis-ab') {
+      list.sort(function (a, b) {
+        var va = preisWert(a), vb = preisWert(b);
+        if (va === null && vb === null) return 0;
+        if (va === null) return 1;                       // ohne Preis ans Ende
+        if (vb === null) return -1;
+        return sortMode === 'preis-auf' ? va - vb : vb - va;
+      });
+    }
+  }
+
+  /** Zeigt eine Schaltflaeche, wenn ueber die Adresszeile vorgefiltert wurde. */
+  function zeigeSchnellFilter() {
+    var box = $('#active-filter');
+    if (!box) return;
+
+    box.textContent = '';
+    if (!schnellFilter) { show(box, false); return; }
+
+    var namen = { neu: 'Neu eingetroffen', highlight: 'Highlights',
+                  bestseller: 'Bestseller', limited: 'Limited Edition' };
+
+    var chip = el('button', 'filter-chip');
+    chip.type = 'button';
+    chip.appendChild(document.createTextNode(namen[schnellFilter] || schnellFilter));
+    var x = el('span', 'filter-x');
+    x.textContent = '\u00d7';
+    chip.appendChild(x);
+    chip.addEventListener('click', function () {
+      schnellFilter = '';
+      applyView();
+    });
+
+    box.appendChild(chip);
+    show(box, true);
   }
 
   /* ---------- Kachelbau ---------- */
@@ -786,15 +975,18 @@
 
   function isHidden(item) { return !!item.nsfw && !revealed.has(item); }
 
+  /** Nach dem Aufdecken die jeweilige Ansicht neu zeichnen. */
   function reveal(item) {
     revealed.add(item);
-    applyView();
-    renderFeaturedAgain();
+    if (istShop) applyView(); else renderReihenNeu();
   }
 
-  function renderFeaturedAgain() {
-    var picks = allItems.filter(function (it) { return it.featured; });
-    if (picks.length) fillGrid($('#featured-grid'), picks);
+  function renderReihenNeu() {
+    REIHEN.forEach(function (r) {
+      var gitter = $(r.gitter);
+      if (!gitter || $(r.sektion).hidden) return;
+      fillGrid(gitter, allItems.filter(r.test).slice(0, REIHEN_MAX));
+    });
   }
 
   function nsfwTag() {
@@ -1002,40 +1194,18 @@
     }
   });
 
+  // Die Lupe fuehrt zur Produktseite; dort sitzt die Suche in der Spalte.
   var searchToggle = $('#search-toggle');
-  var searchDrawer = $('#search-drawer');
-  var searchInput = $('#search-input');
+  if (searchToggle) {
+    searchToggle.addEventListener('click', function () {
+      var feld = $('#search-input');
+      if (feld) {
+        feld.scrollIntoView({ block: 'center' });
+        feld.focus();
+      } else {
+        location.href = 'produkte.html';
+      }
+    });
+  }
 
-  searchToggle.addEventListener('click', function () {
-    var open = searchDrawer.hidden;
-    show(searchDrawer, open);
-    searchToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open) searchInput.focus();
-  });
-
-  searchInput.addEventListener('input', function () {
-    searchTerm = searchInput.value.trim();
-    show($('#search-clear'), !!searchTerm);
-    applyView();
-  });
-
-  $('#search-clear').addEventListener('click', function () {
-    searchInput.value = '';
-    searchTerm = '';
-    show($('#search-clear'), false);
-    applyView();
-    searchInput.focus();
-  });
-
-  $('#reset-search').addEventListener('click', function () {
-    searchInput.value = '';
-    searchTerm = '';
-    show($('#search-clear'), false);
-    setCategory('Alle');
-  });
-
-  $('#sort-select').addEventListener('change', function (e) {
-    sortMode = e.target.value;
-    applyView();
-  });
 })();
