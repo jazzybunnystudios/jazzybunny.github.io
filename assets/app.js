@@ -975,10 +975,50 @@
 
   function isHidden(item) { return !!item.nsfw && !revealed.has(item); }
 
-  /** Nach dem Aufdecken die jeweilige Ansicht neu zeichnen. */
+  /**
+   * Aufdecken laeuft ueber die Altersabfrage. Einmal bestaetigt, wird nicht
+   * wieder gefragt - die Bilder bleiben trotzdem bei jedem Besuch zuerst
+   * unscharf, aufgedeckt wird immer erst auf Klick.
+   */
   function reveal(item) {
-    revealed.add(item);
-    if (istShop) applyView(); else renderReihenNeu();
+    mitAltersnachweis(function () {
+      revealed.add(item);
+      if (istShop) applyView(); else renderReihenNeu();
+      if (!lb.hidden) lb.classList.remove('nsfw-hidden');
+    });
+  }
+
+  /* ---------- Altersabfrage ---------- */
+  var alterDialog = $('#agegate');
+  var alterWeiter = null;
+
+  function mitAltersnachweis(fn) {
+    if (!alterDialog || store('ab18') === 'ja') { fn(); return; }
+
+    alterWeiter = fn;
+    show(alterDialog, true);
+    document.body.style.overflow = 'hidden';
+    $('#agegate-yes').focus();
+  }
+
+  function alterSchliessen() {
+    alterWeiter = null;
+    show(alterDialog, false);
+    // Scrollsperre nur loesen, wenn nicht noch die Detailansicht offen ist.
+    if (lb.hidden) document.body.style.overflow = '';
+  }
+
+  if (alterDialog) {
+    $('#agegate-yes').addEventListener('click', function () {
+      store('ab18', 'ja');
+      var fn = alterWeiter;
+      alterSchliessen();
+      if (fn) fn();
+    });
+    $('#agegate-no').addEventListener('click', alterSchliessen);
+    alterDialog.addEventListener('click', function (e) {
+      if (e.target === alterDialog) alterSchliessen();
+    });
   }
 
   function renderReihenNeu() {
@@ -1153,7 +1193,6 @@
   lb.querySelector('.lb-reveal').addEventListener('click', function () {
     var item = lbList[lbIndex];
     if (item) reveal(item);
-    lb.classList.remove('nsfw-hidden');
   });
 
   lb.querySelector('.lb-close').addEventListener('click', closeLightbox);
@@ -1162,6 +1201,10 @@
   lb.addEventListener('click', function (e) { if (e.target === lb) closeLightbox(); });
 
   document.addEventListener('keydown', function (e) {
+    if (alterDialog && !alterDialog.hidden) {
+      if (e.key === 'Escape') alterSchliessen();
+      return;
+    }
     if (!lb.hidden) {
       if (e.key === 'Escape') closeLightbox();
       else if (e.key === 'ArrowLeft') step(-1);

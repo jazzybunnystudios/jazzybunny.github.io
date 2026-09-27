@@ -285,6 +285,20 @@ Jedes Objekt hat im Admin einen Umschalter **NSFW**. Ist er an:
 Aufgedeckt bleibt es nur für den aktuellen Besuch – nach einem Neuladen ist wieder alles
 verdeckt.
 
+### Altersabfrage
+
+Vor dem allerersten Aufdecken erscheint mittig ein Dialog: **„Nur für Erwachsene –
+Ja, ich bin 18 / Nein"**. Erst nach dem Ja wird das Bild scharf.
+
+Die Bestätigung merkt sich der Browser dauerhaft, es wird also nur einmal gefragt.
+Die Bilder bleiben trotzdem bei jedem Besuch zuerst unscharf – aufgedeckt wird immer
+erst auf Klick. Das gilt an beiden Stellen: auf der Kachel und über den Knopf in der
+Detailansicht.
+
+> Auch das ist eine Anzeige-Entscheidung im Browser, keine geprüfte Altersverifikation.
+> Wer die Bilddatei direkt aufruft, umgeht sie. Für eine rechtssichere Altersprüfung
+> nach deutschem Jugendmedienschutz reicht eine Ja/Nein-Abfrage nicht aus.
+
 > Auch das ist eine Anzeige-Entscheidung im Browser, keine Zugangssperre: Die Bilddatei
 > selbst liegt unverändert unter `images/uploads/` und ist über ihre direkte Adresse
 > abrufbar. Für eine echte Altersprüfung reicht das nicht.

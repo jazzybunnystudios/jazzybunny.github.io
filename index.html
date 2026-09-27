@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="JazzyBunny Studios">
 <meta property="og:description" content="Galerie für individuelle 3D-Druck Objekte">
-<link rel="stylesheet" href="assets/style.css?v=10">
+<link rel="stylesheet" href="assets/style.css?v=11">
 <link rel="icon" type="image/png" href="assets/favicon.png?v=2">
 </head>
 <body class="booting">
@@ -229,6 +229,19 @@
   <span>Bestellen</span>
 </a>
 
+<!-- Altersabfrage vor dem Aufdecken von NSFW-Inhalten -->
+<div id="agegate" class="lightbox agegate" hidden role="dialog" aria-modal="true" aria-labelledby="agegate-title">
+  <div class="agegate-box">
+    <span class="agegate-badge">18+</span>
+    <h2 id="agegate-title">Nur für Erwachsene</h2>
+    <p id="agegate-text">Dieses Objekt ist als NSFW gekennzeichnet. Bitte bestätige, dass du mindestens 18 Jahre alt bist.</p>
+    <div class="agegate-actions">
+      <button type="button" class="btn btn-primary" id="agegate-yes">Ja, ich bin 18</button>
+      <button type="button" class="btn btn-ghost" id="agegate-no">Nein</button>
+    </div>
+  </div>
+</div>
+
 <!-- Rechtstexte -->
 <div id="legal" class="lightbox legal-modal" hidden role="dialog" aria-modal="true" aria-label="Rechtstext">
   <button class="lb-close icon-btn" type="button" aria-label="Schließen">&times;</button>
@@ -238,6 +251,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=13"></script>
+<script src="assets/app.js?v=14"></script>
 </body>
 </html>
