@@ -306,6 +306,31 @@ wen es anrufen soll. Eine führende Null der Ortsvorwahl entfällt.
 Ist das Feld leer, fällt der Bestellknopf auf die E-Mail-Adresse zurück; fehlt auch die,
 führt er zum Kontaktbereich.
 
+### Die Nachrichten anpassen
+
+Zwei weitere Felder bestimmen, was schon im Chatfenster steht:
+
+**WhatsApp-Nachricht (allgemein)** – für den schwebenden Knopf und den Kontaktknopf.
+Standard: *„Hallo! Ich habe eine Frage."*
+
+**WhatsApp-Nachricht (Bestellung)** – für den Knopf am Objekt. Standard:
+*„Hallo! Ich möchte gerne bestellen: {titel} ({id})"*
+
+Darin werden diese Platzhalter ersetzt:
+
+| Platzhalter | wird zu |
+|---|---|
+| `{titel}` | Titel des Objekts |
+| `{id}` | Produkt-ID |
+| `{preis}` | Preis-Hinweis |
+| `{kategorie}` | Kategorie |
+
+Hat ein Objekt das Feld nicht gefüllt, verschwindet der Platzhalter ersatzlos –
+leer gebliebene Klammern und doppelte Leerzeichen räume ich mit weg. Andere
+Satzzeichen bleiben aber stehen: Aus *„{titel} für {preis} bestellen"* wird ohne
+Preis *„Vase für bestellen"*. Bau deine Sätze also so, dass sie auch ohne die
+optionalen Angaben funktionieren – der Standardtext tut das.
+
 ## Discord-Widget
 
 Das Feld **Einstellungen → Discord-Widget** zeigt deinen Server unten im

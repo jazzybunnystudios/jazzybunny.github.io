@@ -397,9 +397,29 @@ collections:
             hint: >-
               Nummer mit Ländervorwahl (z. B. "+49 170 1234567") oder ein
               fertiger wa.me-Link. Ist das Feld gefüllt, führt der Knopf in
-              der Detailansicht direkt zu WhatsApp statt zum Kontaktbereich –
-              mit Objektname und Produkt-ID schon in der Nachricht. Zusätzlich
-              erscheint unten rechts ein schwebender WhatsApp-Knopf.
+              der Detailansicht direkt zu WhatsApp statt zum Kontaktbereich.
+              Zusätzlich erscheint unten rechts ein schwebender
+              WhatsApp-Knopf.
+
+          - label: WhatsApp-Nachricht (allgemein)
+            name: whatsapp_text
+            widget: string
+            required: false
+            hint: >-
+              Steht schon im Chatfenster, wenn jemand den schwebenden Knopf
+              unten rechts oder "WhatsApp" bei den Kontakten antippt.
+              Leer lassen nimmt: "Hallo! Ich habe eine Frage."
+
+          - label: WhatsApp-Nachricht (Bestellung)
+            name: whatsapp_order_text
+            widget: string
+            required: false
+            hint: >-
+              Für den Bestellknopf am Objekt. Platzhalter werden ersetzt:
+              {titel}, {id}, {preis}, {kategorie}. Leere Platzhalter und
+              übrig gebliebene Klammern räume ich automatisch weg.
+              Leer lassen nimmt:
+              "Hallo! Ich möchte gerne bestellen: {titel} ({id})"
 
           - label: E-Mail
             name: email

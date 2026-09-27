@@ -149,13 +149,31 @@
     return 'https://wa.me/' + waNumber + (text ? '?text=' + encodeURIComponent(text) : '');
   }
 
+  var WA_TEXT_STD = 'Hallo! Ich habe eine Frage.';
+  var WA_ORDER_STD = 'Hallo! Ich möchte gerne bestellen: {titel} ({id})';
+
   function buildWhatsApp(s) {
     waNumber = whatsappNumber(s.whatsapp);
     if (!waNumber) return;
 
     var float = $('#wa-float');
-    float.href = whatsappLink('Hallo! Ich habe eine Frage zu ' + (s.title || 'euren Objekten') + '.');
+    float.href = whatsappLink(s.whatsapp_text || WA_TEXT_STD);
     show(float, true);
+  }
+
+  /**
+   * Setzt {titel}, {id}, {preis} und {kategorie} ein. Platzhalter ohne Wert
+   * hinterlassen sonst leere Klammern – die werden hier mit weggeräumt.
+   */
+  function fillTemplate(tpl, item) {
+    return String(tpl)
+      .replace(/\{titel\}/gi, item.title || 'Objekt')
+      .replace(/\{id\}/gi, item.product_id || '')
+      .replace(/\{preis\}/gi, item.price_note || '')
+      .replace(/\{kategorie\}/gi, item.category || '')
+      .replace(/\(\s*\)|\[\s*\]/g, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
   }
 
   /* ---------- Discord-Widget ---------- */
@@ -259,7 +277,9 @@
     container.textContent = '';
 
     var entries = [];
-    if (waNumber) entries.push({ href: whatsappLink('Hallo!'), label: 'WhatsApp', ext: true });
+    if (waNumber) {
+      entries.push({ href: whatsappLink(s.whatsapp_text || WA_TEXT_STD), label: 'WhatsApp', ext: true });
+    }
     if (s.email) entries.push({ href: 'mailto:' + s.email, label: style === 'plain' ? 'E-Mail' : s.email });
     if (s.instagram) entries.push({ href: social('instagram.com', s.instagram), label: 'Instagram', ext: true });
     if (s.tiktok) entries.push({ href: social('tiktok.com/@', s.tiktok, true), label: 'TikTok', ext: true });
@@ -761,9 +781,9 @@
     cta.className = 'btn btn-primary lb-cta';
 
     if (waNumber) {
-      // Direkt zur Bestellung, Objektname und Produkt-ID stehen schon drin.
+      // Direkt zur Bestellung, Nachricht kommt aus den Einstellungen.
       cta.className = 'btn btn-wa lb-cta';
-      cta.href = whatsappLink('Hallo! Ich möchte gerne bestellen: ' + name + kennung);
+      cta.href = whatsappLink(fillTemplate(settings.whatsapp_order_text || WA_ORDER_STD, item));
       cta.target = '_blank';
       cta.rel = 'noopener';
       setCtaLabel(cta, 'Über WhatsApp bestellen', true);
