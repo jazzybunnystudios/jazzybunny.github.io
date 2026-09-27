@@ -147,6 +147,23 @@ a { color: inherit; }
   cursor: pointer; text-align: left;
 }
 
+/* ---------- Hinweisleiste fuer angemeldete Admins ---------- */
+.adminbar { background: var(--gold); color: var(--gold-fg); }
+.adminbar[hidden] { display: none; }
+.adminbar-inner {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
+  padding-block: 9px; font-size: .8rem;
+}
+.adminbar strong {
+  font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: .72rem;
+}
+.adminbar span { opacity: .85; }
+.adminbar a { color: inherit; font-weight: 700; text-underline-offset: 3px; }
+.adminbar a:last-child { margin-left: auto; }
+
+/* Bei gesperrter Seite auch die Hinweisleiste ausblenden. */
+body.maintenance-on .adminbar { display: none; }
+
 /* ---------- Ankündigungsleiste ---------- */
 .announce { background: var(--accent); color: var(--accent-fg); }
 .announce[hidden] { display: none; }
@@ -296,13 +313,16 @@ html[data-theme="light"] .maintenance-logo { filter: invert(1); }
 /* ---------- Kennzahlen-Streifen ---------- */
 .strip { background: var(--bg-sunken); border-bottom: 1px solid var(--border); }
 .strip[hidden] { display: none; }
+/* Trennlinien als Rahmen statt als Luecke: bei ungerader Anzahl bliebe sonst
+   in der letzten Reihe ein grauer Block stehen. */
 .strip-inner {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1px; background: var(--border);
 }
 .strip-item {
-  background: var(--bg-sunken); padding: 24px 18px; text-align: center;
+  padding: 24px 18px; text-align: center;
+  border-left: 1px solid var(--border);
 }
+.strip-item:first-child { border-left: 0; }
 .strip-item b {
   display: block; font-size: 1.7rem; font-weight: 900; letter-spacing: -.02em;
   color: var(--accent);
@@ -753,6 +773,49 @@ html[data-theme="light"] .maintenance-logo { filter: invert(1); }
 
 /* Bei offener Detailansicht stoert er nur. */
 body.lightbox-open .wa-float { display: none; }
+
+/* ---------- Über uns ---------- */
+.about-intro {
+  margin: 16px 0 0; max-width: 62ch;
+  color: var(--fg-muted); font-size: clamp(1rem, 2vw, 1.12rem);
+  white-space: pre-line;
+}
+.about-intro:empty { display: none; }
+
+.about-hero {
+  width: 100%; max-height: 420px; object-fit: cover;
+  border-radius: var(--radius-lg); border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.about-hero[hidden] { display: none; }
+
+.about-body { padding-block: clamp(40px, 6vw, 72px); display: flex; flex-direction: column; gap: clamp(40px, 6vw, 72px); }
+
+.about-block {
+  display: grid; gap: clamp(24px, 4vw, 48px); align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.about-block.is-wide { grid-template-columns: minmax(0, 1fr); max-width: 72ch; }
+.about-block.is-flipped .about-text { order: 2; }
+
+.about-text h2 {
+  margin: 0 0 14px; font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 900; letter-spacing: -.02em; text-transform: uppercase; line-height: 1.15;
+}
+.about-text p {
+  margin: 0; color: var(--fg-muted); font-size: 1rem; line-height: 1.75;
+  white-space: pre-line;
+}
+
+.about-figure { overflow: hidden; border-radius: var(--radius-lg); border: 1px solid var(--border); }
+.about-figure img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 4 / 3; }
+
+.about-cta { border-top: 1px solid var(--border); }
+
+@media (max-width: 760px) {
+  .about-block { grid-template-columns: minmax(0, 1fr); }
+  .about-block.is-flipped .about-text { order: 0; }
+}
 
 /* ---------- Altersabfrage ---------- */
 .agegate { z-index: 120; }

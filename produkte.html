@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Alle Produkte – JazzyBunny Studios">
 <meta property="og:description" content="Galerie für individuelle 3D-Druck Objekte">
-<link rel="stylesheet" href="assets/style.css?v=16">
+<link rel="stylesheet" href="assets/style.css?v=19">
 <link rel="icon" type="image/png" href="assets/favicon.png?v=2">
 </head>
 <body class="booting">
@@ -22,6 +22,16 @@
     <p id="maintenance-text"></p>
   </div>
 </section>
+
+<!-- Hinweis nur für angemeldete Admins: Seite ist für Besucher gesperrt -->
+<div id="adminbar" class="adminbar" hidden>
+  <div class="wrap adminbar-inner">
+    <strong>Vorschau</strong>
+    <span>Für Besucher ist die Seite gesperrt. Du siehst sie, weil du im Admin angemeldet bist.</span>
+    <a href="?sperre=1">Sperrseite ansehen</a>
+    <a href="admin/">Zum Admin</a>
+  </div>
+</div>
 
 <!-- Ankündigungsleiste -->
 <div id="announce" class="announce" hidden>
@@ -44,6 +54,7 @@
     <nav class="main-nav" id="main-nav">
       <a href="index.html">Start</a>
       <a href="produkte.html" aria-current="page">Produkte</a>
+      <a href="ueber-uns.html">Über uns</a>
       <a href="index.html#kategorien" data-nav="kategorien" hidden>Kategorien</a>
       <a href="index.html#faq" data-nav="faq" hidden>FAQ</a>
       <a href="index.html#kontakt">Kontakt</a>
@@ -164,6 +175,7 @@
     <div class="footer-col">
       <h4>Entdecken</h4>
       <a href="index.html">Start</a>
+      <a href="ueber-uns.html">Über uns</a>
       <a href="index.html#kategorien" data-nav="kategorien" hidden>Kategorien</a>
       <a href="index.html#faq" data-nav="faq" hidden>FAQ</a>
     </div>
@@ -240,6 +252,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=16"></script>
+<script src="assets/app.js?v=18"></script>
 </body>
 </html>

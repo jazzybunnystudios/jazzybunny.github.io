@@ -154,7 +154,7 @@ ausgeliefert und die Änderung ist live.
 
 ## Die beiden Seiten
 
-Die Webseite besteht aus zwei Dateien. Beide teilen sich Kopfzeile, Fußzeile,
+Die Webseite besteht aus drei Seiten. Alle teilen sich Kopfzeile, Fußzeile,
 Detailansicht, Design und Skript.
 
 ### Startseite (`index.html`)
@@ -174,6 +174,21 @@ Die vier Reihen füllen sich von allein aus den Schaltern am Objekt:
 Jede Reihe zeigt höchstens **vier** Objekte und daneben „Alle ansehen", das auf die
 Produktseite mit genau diesem Filter führt. Reihen ohne passende Objekte erscheinen
 gar nicht erst – genau wie Kategorien, Kennzahlen und FAQ.
+
+### Über uns (`ueber-uns.html`)
+
+Eigene Unterseite, komplett im Admin unter **Über uns** gepflegt:
+
+* **Überschrift** und **Einleitung**
+* **Großes Bild** unter der Einleitung
+* **Zahlen** – schmaler Balken wie auf der Startseite
+* **Abschnitte** – beliebig viele Blöcke aus Überschrift, Text und optionalem
+  Bild. Blöcke mit Bild wechseln automatisch die Seite, einmal links, einmal
+  rechts; Blöcke ohne Bild laufen über die volle Breite
+* **Abschluss** – Überschrift, Text und ein Knopf, z. B. zur Produktseite
+
+Leere Felder erscheinen nicht. Mit komplett leerem Inhalt bleibt nur die
+Überschrift stehen – kaputt sieht dabei nichts aus.
 
 ### Produktseite (`produkte.html`)
 
@@ -238,6 +253,7 @@ in der Config; auf der Live-Seite wird die Einstellung ignoriert.
 ```
 index.html              Startseite mit den kuratierten Reihen
 produkte.html           Produktseite mit Filterspalte
+ueber-uns.html          Seite "Über uns"
 assets/style.css        Design (dunkel als Standard, heller Modus per Umschalter)
 assets/app.js           Lädt die JSON-Dateien und baut daraus die Seite
 assets/wordmark.webp    Wortmarke (Kopfzeile, Fußzeile, Sperrseite)
@@ -245,6 +261,7 @@ assets/gotham.woff2     Zierschrift für die grossen Überschriften
 assets/favicon.png      Browser-Tab-Symbol (J-Monogramm)
 content/gallery.json    ← vom CMS: deine Objekte
 content/home.json       ← vom CMS: Bühne, Überschriften, Kennzahlen, FAQ
+content/about.json      ← vom CMS: Inhalte der Seite "Über uns"
 content/settings.json   ← vom CMS: Titel, Logo, Farbe, Kontakt, Rechtstexte
 images/uploads/         ← hier landen die hochgeladenen Bilder
 admin/index.html        Lädt Decap CMS
@@ -321,6 +338,24 @@ aus. `content/gallery.json` wird bei gesperrter Seite gar nicht erst geladen.
 Die Sperrseite zeigt nur Logo, Überschrift und Zusatztext – **keine Kontaktdaten,
 keinen WhatsApp-Knopf und kein Discord-Widget.** Wer zu ist, soll nicht gleichzeitig
 zum Bestellen einladen. An Discord geht dabei auch keine Anfrage raus.
+
+### Als Admin trotzdem draufschauen
+
+Warst du in diesem Browser schon mal unter `/admin/` mit GitHub angemeldet, siehst du
+die Seite trotz Sperre ganz normal. Oben läuft dann ein goldener Balken mit dem
+Hinweis, dass Besucher nur die Sperrseite sehen.
+
+Dafür gibt es **kein Passwort** – eins in einer statischen Datei könnte jeder
+auslesen und wäre wertlos. Stattdessen wird geprüft, ob Decap nach dem GitHub-Login
+seinen Eintrag im Browserspeicher hinterlassen hat. Der entsteht nur durch eine echte
+Anmeldung mit Schreibrechten am Repository und lässt sich nicht erraten.
+
+Willst du sehen, was Besucher sehen, hängst du **`?sperre=1`** an die Adresse – oder
+klickst im goldenen Balken auf „Sperrseite ansehen". Auch der Link zum Admin ist dort.
+
+> Wie beim Rest der Sperre gilt: Das ist eine Anzeige-Entscheidung im Browser. Wer
+> sich auskennt, kann den Eintrag von Hand setzen. Zu schützen gibt es dahinter aber
+> ohnehin nichts – die Inhalte liegen als öffentliche Dateien im Repository.
 
 > **Das ist ein Hinweisschild, keine Zugangssperre.** GitHub Pages liefert nur
 > statische Dateien aus, es gibt keinen Server, der Anfragen abweisen könnte. Wer die

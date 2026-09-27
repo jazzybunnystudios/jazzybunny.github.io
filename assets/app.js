@@ -76,14 +76,41 @@
     settings = res[0] || {};
     home = res[1] || {};
 
+    gesperrt = !!settings.maintenance && !adminDarfSehen();
+
     applySettings(settings);
     document.body.classList.remove('booting');
 
-    if (settings.maintenance) { showMaintenance(settings); return; }
+    if (gesperrt) { showMaintenance(settings); return; }
+    if (settings.maintenance) show($('#adminbar'), true);   // Admin sieht die Seite
 
     applyHome(home, settings);
-    loadGallery();
+    if (istUeberUns) loadAbout(); else loadGallery();
   });
+
+  /* ================= Sperre und Admin-Vorschau ================= */
+
+  var gesperrt = false;
+
+  /**
+   * Kein Passwort in den Dateien - das koennte jeder auslesen. Stattdessen
+   * zaehlt die Anmeldung im CMS: Decap legt nach dem GitHub-Login einen
+   * Eintrag im Browserspeicher ab. Ist der da, war hier jemand mit
+   * Schreibrechten am Repository unterwegs.
+   * Mit "?sperre=1" in der Adresse sieht auch der Admin die Sperrseite.
+   */
+  function adminDarfSehen() {
+    if (new URLSearchParams(location.search).get('sperre')) return false;
+
+    var roh = store('decap-cms-user');
+    if (!roh) return false;
+    try {
+      var d = JSON.parse(roh);
+      return !!(d && (d.token || d.login || d.email));
+    } catch (e) {
+      return false;
+    }
+  }
 
   /* ================= Einstellungen ================= */
 
@@ -153,7 +180,7 @@
   var WA_ORDER_STD = 'Hallo! Ich möchte gerne bestellen: {titel} ({id})';
 
   function buildWhatsApp(s) {
-    if (s.maintenance) return;                  // gesperrte Seite: kein Bestellknopf
+    if (gesperrt) return;                       // gesperrte Seite: kein Bestellknopf
     waNumber = whatsappNumber(s.whatsapp);
     if (!waNumber) return;
 
@@ -190,7 +217,7 @@
     var raw = String(s.discord || '').trim();
     // Den Kasten gibt es nur auf der Startseite. Bei gesperrter Seite gar
     // nicht laden, sonst ginge trotzdem eine Anfrage an Discord raus.
-    if (!raw || s.maintenance || !$('#discord-box')) return;
+    if (!raw || gesperrt || !$('#discord-box')) return;
 
     discordId = discordServerId(raw);
 
@@ -436,11 +463,112 @@
     }
   }
 
+  /* ================= Über uns ================= */
+
+  function loadAbout() {
+    loadJSON('content/about.json').then(function (a) {
+      show($('#state-loading'), false);
+      renderAbout(a || {});
+    }).catch(function (err) {
+      console.error(err);
+      show($('#state-loading'), false);
+    });
+  }
+
+  function renderAbout(a) {
+    if (a.title) {
+      txt($('#about-title'), a.title);
+      document.title = a.title + ' – ' + (settings.title || 'Startseite');
+    }
+    txt($('#about-intro'), a.intro || '');
+
+    var hero = $('#about-hero');
+    if (a.image) {
+      hero.src = mediaUrl(a.image);
+      hero.alt = a.title || '';
+      show(hero, true);
+    }
+
+    renderAboutFacts(a.facts);
+    renderAboutSections(a.sections);
+    renderAboutCta(a);
+  }
+
+  function renderAboutFacts(facts) {
+    if (!Array.isArray(facts) || !facts.length) return;
+    var box = $('#about-facts');
+    if (!box) return;
+
+    facts.forEach(function (f) {
+      if (!f || (!f.value && !f.label)) return;
+      var item = el('div', 'strip-item');
+      var b = el('b'); b.textContent = f.value || '';
+      var sp = el('span'); sp.textContent = f.label || '';
+      item.appendChild(b); item.appendChild(sp);
+      box.appendChild(item);
+    });
+    if (box.children.length) show($('#about-strip'), true);
+  }
+
+  /** Abschnitte wechseln die Bildseite ab, sofern ein Bild dabei ist. */
+  function renderAboutSections(sections) {
+    if (!Array.isArray(sections)) return;
+    var box = $('#about-sections');
+    if (!box) return;
+
+    var mitBild = 0;
+    sections.forEach(function (sec) {
+      if (!sec || (!sec.title && !sec.text && !sec.image)) return;
+
+      var block = el('section', 'about-block');
+      if (sec.image && mitBild % 2 === 1) block.classList.add('is-flipped');
+      if (sec.image) mitBild++;
+
+      var text = el('div', 'about-text');
+      if (sec.title) {
+        var h = el('h2');
+        h.textContent = sec.title;
+        text.appendChild(h);
+      }
+      if (sec.text) {
+        var p = el('p');
+        p.textContent = sec.text;
+        text.appendChild(p);
+      }
+      block.appendChild(text);
+
+      if (sec.image) {
+        var fig = el('div', 'about-figure');
+        var img = el('img');
+        img.src = mediaUrl(sec.image);
+        img.alt = sec.title || '';
+        img.loading = 'lazy';
+        fig.appendChild(img);
+        block.appendChild(fig);
+      } else {
+        block.classList.add('is-wide');
+      }
+
+      box.appendChild(block);
+    });
+  }
+
+  function renderAboutCta(a) {
+    if (!a.cta_text && !a.cta_title) return;
+    txt($('#about-cta-title'), a.cta_title || 'Neugierig geworden?');
+    txt($('#about-cta-text'), a.cta_intro || '');
+    var btn = $('#about-cta-btn');
+    txt(btn, a.cta_text || 'Zur Produktseite');
+    if (a.cta_link) btn.href = a.cta_link;
+    show($('#about-cta'), true);
+  }
+
   /* ================= Produkte ================= */
 
   // Eine Datei bedient beide Seiten. Welche gerade laeuft, verraet das Markup:
   // die Produktseite hat die Filterspalte, die Startseite die Reihen.
   var istShop = !!$('.shop-side');
+  var istUeberUns = !!$('#about-sections');
 
   var allItems = [];
   var visibleItems = [];

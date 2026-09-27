@@ -364,7 +364,114 @@ collections:
             required: false
 
   # =================================================================
-  #  3. Einstellungen
+  #  3. Über uns
+  # =================================================================
+  - name: about
+    label: Über uns
+    delete: false
+    editor:
+      preview: false
+    files:
+      - name: page
+        label: Seite "Über uns"
+        file: content/about.json
+        format: json
+        description: >-
+          Die Unterseite ueber-uns.html. Alle Felder sind freiwillig – was du
+          leer lässt, erscheint auf der Seite gar nicht erst.
+        fields:
+          - label: Überschrift
+            name: title
+            widget: string
+            required: false
+            default: Über uns
+
+          - label: Einleitung
+            name: intro
+            widget: text
+            required: false
+            hint: Kurzer Absatz direkt unter der Überschrift.
+
+          - label: Großes Bild
+            name: image
+            widget: image
+            required: false
+            hint: >-
+              Breites Bild unter der Einleitung, z. B. dein Arbeitsplatz oder
+              eine Auswahl deiner Objekte. Querformat wirkt am besten.
+
+          - label: Zahlen
+            name: facts
+            widget: list
+            required: false
+            collapsed: true
+            label_singular: Zahl
+            summary: "{{fields.value}} – {{fields.label}}"
+            hint: >-
+              Schmaler Balken, z. B. "5 Jahre · Erfahrung". Leer lassen
+              blendet ihn aus.
+            fields:
+              - label: Zahl
+                name: value
+                widget: string
+              - label: Beschriftung
+                name: label
+                widget: string
+
+          - label: Abschnitte
+            name: sections
+            widget: list
+            required: false
+            collapsed: true
+            label_singular: Abschnitt
+            summary: "{{fields.title}}"
+            hint: >-
+              Der eigentliche Text der Seite, in Blöcken. Jeder Block kann ein
+              Bild haben – die Bilder wechseln dann automatisch die Seite,
+              einmal links, einmal rechts. Blöcke ohne Bild laufen über die
+              volle Breite. Du kannst beliebig viele anlegen und per
+              Drag & Drop sortieren.
+            fields:
+              - label: Überschrift
+                name: title
+                widget: string
+                required: false
+              - label: Text
+                name: text
+                widget: text
+                required: false
+              - label: Bild
+                name: image
+                widget: image
+                required: false
+
+          # --- Abschluss ---
+          - label: Abschluss – Überschrift
+            name: cta_title
+            widget: string
+            required: false
+            hint: Leer lassen blendet den ganzen Abschluss-Block aus.
+
+          - label: Abschluss – Text
+            name: cta_intro
+            widget: text
+            required: false
+
+          - label: Abschluss – Knopf
+            name: cta_text
+            widget: string
+            required: false
+            hint: 'z. B. "Zur Produktseite". Leer lassen blendet den Block aus.'
+
+          - label: Abschluss – Knopf-Ziel
+            name: cta_link
+            widget: string
+            required: false
+            default: produkte.html
+            hint: '"produkte.html", "index.html#kontakt" oder eine volle Adresse.'
+
+  # =================================================================
+  #  4. Einstellungen
   # =================================================================
   - name: settings
     label: Einstellungen
