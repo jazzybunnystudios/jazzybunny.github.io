@@ -153,6 +153,7 @@
   var WA_ORDER_STD = 'Hallo! Ich möchte gerne bestellen: {titel} ({id})';
 
   function buildWhatsApp(s) {
+    if (s.maintenance) return;                  // gesperrte Seite: kein Bestellknopf
     waNumber = whatsappNumber(s.whatsapp);
     if (!waNumber) return;
 
@@ -187,8 +188,9 @@
 
   function buildDiscord(s) {
     var raw = String(s.discord || '').trim();
-    // Den Kasten gibt es nur auf der Startseite.
-    if (!raw || !$('#discord-box')) return;
+    // Den Kasten gibt es nur auf der Startseite. Bei gesperrter Seite gar
+    // nicht laden, sonst ginge trotzdem eine Anfrage an Discord raus.
+    if (!raw || s.maintenance || !$('#discord-box')) return;
 
     discordId = discordServerId(raw);
 
@@ -345,7 +347,8 @@
     txt($('#maintenance-title'), heading);
     txt($('#maintenance-text'), s.maintenance_text || '');
     if (s.logo === '') show($('#maintenance-logo'), false);
-    buildContactLinks($('#maintenance-contact'), s, false, 'button');
+    // Bewusst ohne Kontaktwege: auf einer gesperrten Seite soll niemand
+    // zum Schreiben oder Bestellen eingeladen werden.
     show($('#maintenance'), true);
   }
 

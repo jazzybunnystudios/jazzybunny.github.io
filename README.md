@@ -318,6 +318,10 @@ sind in den beiden Feldern darunter frei einstellbar.
 Der Admin-Bereich unter `/admin/` bleibt dabei erreichbar, du sperrst dich also nicht
 aus. `content/gallery.json` wird bei gesperrter Seite gar nicht erst geladen.
 
+Die Sperrseite zeigt nur Logo, Überschrift und Zusatztext – **keine Kontaktdaten,
+keinen WhatsApp-Knopf und kein Discord-Widget.** Wer zu ist, soll nicht gleichzeitig
+zum Bestellen einladen. An Discord geht dabei auch keine Anfrage raus.
+
 > **Das ist ein Hinweisschild, keine Zugangssperre.** GitHub Pages liefert nur
 > statische Dateien aus, es gibt keinen Server, der Anfragen abweisen könnte. Wer die
 > direkte Adresse einer Datei unter `images/uploads/` kennt, kann sie weiterhin
