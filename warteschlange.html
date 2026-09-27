@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Warteschlange – JazzyBunny Studios">
 <meta property="og:description" content="Galerie für individuelle 3D-Druck Objekte">
-<link rel="stylesheet" href="assets/style.css?v=20">
+<link rel="stylesheet" href="assets/style.css?v=21">
 <link rel="icon" type="image/png" href="assets/favicon.png?v=2">
 </head>
 <body class="booting">
@@ -93,6 +93,15 @@
       <strong id="queue-hint-title"></strong>
       <p id="queue-hint-text"></p>
     </div>
+  </div>
+
+  <div class="wrap wrap-narrow">
+    <div class="queue-search">
+      <label class="visually-hidden" for="queue-search">Auftrag suchen</label>
+      <input type="search" id="queue-search" placeholder="Auftragsnummer, Produkt oder Produkt-ID …" autocomplete="off">
+      <button type="button" id="queue-search-clear" class="linklike" hidden>Zurücksetzen</button>
+    </div>
+    <p class="queue-result" id="queue-result"></p>
   </div>
 
   <div class="wrap wrap-narrow queue-body" id="queue-stages"></div>
@@ -201,6 +210,6 @@
   </div>
 </div>
 
-<script src="assets/app.js?v=19"></script>
+<script src="assets/app.js?v=20"></script>
 </body>
 </html>

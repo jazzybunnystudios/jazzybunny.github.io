@@ -531,10 +531,11 @@
       nummer++;
 
       var sek = el('section', 'queue-stage');
+      sek.dataset.nummer = ('0' + nummer).slice(-2);
 
       var kopf = el('div', 'queue-stage-head');
       var num = el('span', 'queue-num');
-      num.textContent = ('0' + nummer).slice(-2);
+      num.textContent = sek.dataset.nummer;
       kopf.appendChild(num);
 
       var txtBox = el('div');
@@ -561,11 +562,70 @@
 
       box.appendChild(sek);
     });
+
+    verdrahteQueueSuche();
+  }
+
+  /* ---------- Suche in der Warteschlange ---------- */
+
+  function verdrahteQueueSuche() {
+    var feld = $('#queue-search');
+    if (!feld) return;
+
+    feld.addEventListener('input', function () { filterQueue(feld.value); });
+
+    $('#queue-search-clear').addEventListener('click', function () {
+      feld.value = '';
+      filterQueue('');
+      feld.focus();
+    });
+
+    // Vorbelegung aus der Adresse, z. B. warteschlange.html?auftrag=JB-2026-0001
+    var vorgabe = new URLSearchParams(location.search).get('auftrag');
+    if (vorgabe) {
+      feld.value = vorgabe;
+      filterQueue(vorgabe);
+    }
+  }
+
+  /** Blendet Zeilen ohne Treffer aus und mit ihnen leer gewordene Stufen. */
+  function filterQueue(begriff) {
+    var q = String(begriff || '').trim().toLowerCase();
+    var treffer = 0;
+
+    Array.prototype.forEach.call(document.querySelectorAll('.queue-stage'), function (stufe) {
+      var sichtbar = 0;
+
+      Array.prototype.forEach.call(stufe.querySelectorAll('.queue-row'), function (zeile) {
+        var passt = !q || (zeile.dataset.suche || '').indexOf(q) !== -1;
+        zeile.hidden = !passt;
+        if (passt) sichtbar++;
+      });
+
+      stufe.hidden = sichtbar === 0;
+      // Der Zähler zeigt bei aktiver Suche die Treffer dieser Stufe.
+      var zaehler = stufe.querySelector('.queue-count');
+      if (zaehler) zaehler.textContent = sichtbar;
+      treffer += sichtbar;
+    });
+
+    show($('#queue-search-clear'), !!q);
+
+    var hinweis = $('#queue-result');
+    if (!q) txt(hinweis, '');
+    else if (treffer === 0) txt(hinweis, 'Nichts gefunden – stimmt die Auftragsnummer?');
+    else txt(hinweis, treffer === 1 ? '1 Treffer' : treffer + ' Treffer');
   }
 
   function queueRow(a) {
     var zeile = el('div', 'queue-row');
     var erstes = (a.items && a.items[0]) || {};
+
+    // Worin gesucht wird: Auftragsnummer, Produktnamen, Produkt-IDs.
+    zeile.dataset.suche = [a.code]
+      .concat((a.items || []).map(function (i) { return i.title; }))
+      .concat((a.items || []).map(function (i) { return i.productId; }))
+      .filter(Boolean).join(' ').toLowerCase();
 
     var bild = el('div', 'queue-thumb');
     if (erstes.image) {

@@ -205,6 +205,20 @@ Quellen:
 Kundendaten stehen nicht darin. Stufen ohne Aufträge werden übersprungen und die
 verbleibenden fortlaufend nummeriert. NSFW-Objekte erscheinen unscharf.
 
+Oben auf der Seite steht ein **Suchfeld**. Es durchsucht Auftragsnummer,
+Produktname und Produkt-ID; Stufen ohne Treffer verschwinden, die Zähler zeigen
+dann die Trefferzahl. Die Stufennummern bleiben dabei stehen – sie benennen die
+Produktionsstufe, nicht das Suchergebnis.
+
+Die Suche lässt sich über die Adresse vorbelegen:
+
+```
+warteschlange.html?auftrag=JB-2026-0001
+```
+
+Damit kannst du jemandem per WhatsApp einen Link schicken, der direkt seinen
+Auftrag zeigt, statt ihn in der Liste suchen zu lassen.
+
 Einrichtung des Uploads: siehe README der Auftragsverwaltung.
 
 ### Produktseite (`produkte.html`)
