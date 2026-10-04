@@ -46,22 +46,6 @@
     }).join('');
   }
 
-  /* ================= Design-Umschalter ================= */
-
-  var savedTheme = store('theme');
-  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
-
-  $('#theme-toggle').addEventListener('click', function () {
-    var next = activeTheme() === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    store('theme', next);
-
-    // Discord rendert sein Widget serverseitig – neu laden, sonst bleibt es
-    // im alten Design stehen.
-    var frame = $('#discord-frame');
-    if (frame) frame.src = discordSrc();
-  });
-
   txt($('#year'), new Date().getFullYear());
 
   /* ================= Start ================= */
@@ -264,13 +248,8 @@
   }
 
   function discordSrc() {
-    return 'https://discord.com/widget?id=' + discordId + '&theme=' + activeTheme();
-  }
-
-  function activeTheme() {
-    var set = document.documentElement.getAttribute('data-theme');
-    if (set) return set;
-    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Die Seite ist durchgehend dunkel – das Widget ebenfalls.
+    return 'https://discord.com/widget?id=' + discordId + '&theme=dark';
   }
 
   function setImage(node, path, alt) {
@@ -773,6 +752,7 @@
   var allItems = [];
   var visibleItems = [];
   var activeCategory = 'Alle';
+  var activeSub = 'Alle';
   var searchTerm = '';
   var sortMode = 'default';
   var nsfwAus = false;
@@ -826,6 +806,60 @@
       if (c && seen.indexOf(c) === -1) seen.push(c);
     });
     return seen.sort(function (a, b) { return a.localeCompare(b, 'de'); });
+  }
+
+  /**
+   * Unterkategorien innerhalb der gerade gewählten Kategorie.
+   * Bei "Alle" werden sie über alle Produkte gesammelt.
+   */
+  function subcategoriesOf() {
+    var seen = [];
+    allItems.forEach(function (it) {
+      if (activeCategory !== 'Alle' && (it.category || '').trim() !== activeCategory) return;
+      var sc = (it.subcategory || '').trim();
+      if (sc && seen.indexOf(sc) === -1) seen.push(sc);
+    });
+    return seen.sort(function (a, b) { return a.localeCompare(b, 'de'); });
+  }
+
+  /** Baut die Liste neu – sie hängt von der gewählten Kategorie ab. */
+  function buildSubFilters() {
+    var bar = $('#subfilters');
+    if (!bar) return;
+
+    var subs = subcategoriesOf();
+    bar.textContent = '';
+
+    if (!subs.length) {
+      activeSub = 'Alle';
+      show($('#side-subcats'), false);
+      return;
+    }
+
+    // Passt die Auswahl nicht mehr zur Kategorie, fällt sie zurück.
+    if (activeSub !== 'Alle' && subs.indexOf(activeSub) === -1) activeSub = 'Alle';
+
+    ['Alle'].concat(subs).forEach(function (label) {
+      var b = el('button', 'side-cat');
+      b.type = 'button';
+      b.textContent = label;
+      b.dataset.sub = label;
+      b.setAttribute('aria-pressed', label === activeSub ? 'true' : 'false');
+      b.addEventListener('click', function () { setSubcategory(label); });
+      bar.appendChild(b);
+    });
+    show($('#side-subcats'), true);
+  }
+
+  function setSubcategory(label) {
+    activeSub = label;
+    var bar = $('#subfilters');
+    if (bar) {
+      Array.prototype.forEach.call(bar.children, function (c) {
+        c.setAttribute('aria-pressed', c.dataset.sub === label ? 'true' : 'false');
+      });
+    }
+    applyView();
   }
 
   function imagesOf(item) {
@@ -890,6 +924,7 @@
     leseAdresse();
     buildCollections();
     buildFilters();
+    buildSubFilters();
     verdrahteFilter();
     applyView();
   }
@@ -937,6 +972,9 @@
     var kat = p.get('kategorie');
     if (kat) activeCategory = kat;
 
+    var sub = p.get('unterkategorie');
+    if (sub) activeSub = sub;
+
     var f = p.get('filter');
     if (f && reihenTest(f)) schnellFilter = f;
 
@@ -974,6 +1012,7 @@
         c.setAttribute('aria-pressed', c.dataset.cat === label ? 'true' : 'false');
       });
     }
+    buildSubFilters();      // andere Kategorie, andere Unterkategorien
     applyView();
   }
 
@@ -1032,6 +1071,7 @@
     if ($('#sort-select')) $('#sort-select').value = 'default';
 
     setSammlung('');
+    activeSub = 'Alle';
     setCategory('Alle');
   }
 
@@ -1057,6 +1097,10 @@
       list = list.filter(function (it) { return (it.category || '').trim() === activeCategory; });
     }
 
+    if (activeSub !== 'Alle') {
+      list = list.filter(function (it) { return (it.subcategory || '').trim() === activeSub; });
+    }
+
     if (nsfwAus) list = list.filter(function (it) { return !it.nsfw; });
 
     if (preisVon !== null || preisBis !== null) {
@@ -1072,7 +1116,7 @@
     if (searchTerm) {
       var q = searchTerm.toLowerCase();
       list = list.filter(function (it) {
-        return [it.title, it.description, it.category, it.material, it.colors, it.product_id]
+        return [it.title, it.description, it.category, it.subcategory, it.material, it.colors, it.product_id]
           .filter(Boolean).join(' ').toLowerCase().indexOf(q) !== -1;
       });
     }
@@ -1165,7 +1209,7 @@
     var body = el('div', 'card-body');
 
     var cat = el('span', 'card-cat');
-    cat.textContent = item.category || '';
+    cat.textContent = [item.category, item.subcategory].filter(Boolean).join(' · ');
     body.appendChild(cat);
 
     var h3 = el('h3');
@@ -1446,7 +1490,7 @@
 
     lb.classList.toggle('nsfw-hidden', isHidden(item));
 
-    txt($('#lb-cat'), item.category || '');
+    txt($('#lb-cat'), [item.category, item.subcategory].filter(Boolean).join(' · '));
     txt($('#lb-title'), item.title || 'Ohne Titel');
     if (item.nsfw) $('#lb-title').appendChild(nsfwTag());
 
@@ -1472,6 +1516,7 @@
       ['Maße', item.size],
       ['Farben', item.colors],
       ['Druckzeit', item.print_time],
+      ['Unterkategorie', item.subcategory],
       ['Verfügbarkeit', item.status],
       ['Preis', priceNode(item, 'spec-price')],
       ['Produkt-ID', item.product_id]

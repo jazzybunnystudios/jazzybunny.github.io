@@ -80,6 +80,17 @@ collections:
                   entstehen automatisch die Filter-Knöpfe und die
                   Kategorie-Kacheln auf der Startseite.
 
+              - label: Unterkategorie
+                name: subcategory
+                widget: string
+                required: false
+                hint: >-
+                  Feinere Einteilung innerhalb der Kategorie, z. B. "Gold",
+                  "Bemalt" oder "Groß". Auf der Produktseite erscheint daraus
+                  ein eigener Filter unter den Kategorien – und zwar immer nur
+                  mit den Unterkategorien, die es in der gewählten Kategorie
+                  auch gibt. Leer lassen = keine.
+
               - label: NSFW
                 name: nsfw
                 widget: boolean

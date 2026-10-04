@@ -115,6 +115,7 @@ die Reihenfolge auf der Webseite. Pro Objekt:
 |---|---|
 | Hauptbild | Vorschaubild in der Galerie. Hochformat wirkt am besten |
 | Titel, Kategorie | Kategorien erzeugen automatisch Filter-Knöpfe und Kachel-Vorschauen |
+| Unterkategorie | Feinere Einteilung innerhalb der Kategorie, z. B. „Gold“ – erzeugt eine eigene Filterliste auf der Produktseite, siehe unten |
 | Produkt-ID | Deine eigene Kennung, z. B. „JB-042". Steht in der Detailansicht, ist über die Suche findbar und landet im Betreff der Anfrage-Mail |
 | NSFW | Bild unscharf, Kennzeichen neben dem Titel |
 | Neu | Grünes Schild „Neu" oben links auf dem Bild |
@@ -225,11 +226,14 @@ Einrichtung des Uploads: siehe README der Auftragsverwaltung.
 
 Das komplette Sortiment mit Filterspalte:
 
-* **Suche** über Titel, Beschreibung, Kategorie, Material, Farben und Produkt-ID
+* **Suche** über Titel, Beschreibung, Kategorie, Unterkategorie, Material, Farben
+  und Produkt-ID
 * **Auswahl** – dieselben Sammlungen wie die Reihen der Startseite: Neu eingetroffen,
   Highlights, Bestseller, Limited Edition. Es erscheinen nur die, zu denen es auch
   Objekte gibt
 * **Kategorien** als Liste
+* **Unterkategorie** – erscheint nur, wenn es in der gerade gewählten Kategorie
+  welche gibt, siehe unten
 * **NSFW ausblenden** – blendet markierte Objekte ganz aus, statt sie nur unscharf
   zu zeigen
 * **Preis von/bis** – rechnet mit dem reduzierten Preis, Objekte ohne Zahl fallen raus
@@ -241,6 +245,7 @@ der Startseite:
 | Adresse | Wirkung |
 |---|---|
 | `produkte.html?kategorie=Deko` | Kategorie vorgewählt |
+| `produkte.html?unterkategorie=Gold` | Unterkategorie vorgewählt |
 | `produkte.html?filter=neu` | nur neue Objekte (auch `highlight`, `bestseller`, `limited`) |
 | `produkte.html?q=vase` | Suchbegriff vorgegeben |
 
@@ -286,7 +291,7 @@ index.html              Startseite mit den kuratierten Reihen
 produkte.html           Produktseite mit Filterspalte
 ueber-uns.html          Seite "Über uns"
 warteschlange.html      Produktions-Warteschlange
-assets/style.css        Design (dunkel als Standard, heller Modus per Umschalter)
+assets/style.css        Design (durchgehend dunkel)
 assets/app.js           Lädt die JSON-Dateien und baut daraus die Seite
 assets/wordmark.webp    Wortmarke (Kopfzeile, Fußzeile, Sperrseite)
 assets/gotham.woff2     Zierschrift für die grossen Überschriften
@@ -326,6 +331,34 @@ git pull --rebase origin main
 Solange du lokal am Code arbeitest (`assets/`, `admin/`, `index.html`) und das CMS an
 den Inhalten (`content/`, `images/uploads/`), gibt es dabei nie Konflikte – ihr fasst
 verschiedene Dateien an.
+
+## Unterkategorien
+
+Neben der **Kategorie** hat jedes Objekt ein freies Feld **Unterkategorie**. Was du
+dort einträgst, bestimmst du selbst – „Gold“, „Bemalt“, „Groß“, was auch immer zu
+deinem Sortiment passt. Eine Liste zum Pflegen gibt es nicht: Sobald ein Objekt
+den Begriff trägt, existiert die Unterkategorie, und sobald ihn kein Objekt mehr
+trägt, verschwindet sie wieder.
+
+Sichtbar wird sie an drei Stellen:
+
+* auf der Kachel hinter der Kategorie, getrennt durch einen Punkt: *Figuren · Gold*
+* in der Detailansicht in der Kopfzeile und als eigene Zeile in der Angaben-Tabelle
+* auf der Produktseite als **zweite Filterliste** unter den Kategorien
+
+Die Filterliste hängt an der gewählten Kategorie und zeigt immer nur, was es dort
+auch wirklich gibt: Stehen unter „Figuren“ die Unterkategorien Gold und Silber, unter
+„Ersatzteile“ aber Gold und Roh, dann wechselt die Liste beim Umschalten mit. Gibt es
+in einer Kategorie überhaupt keine Unterkategorien, verschwindet der ganze Block.
+Bei **Alle** sammelt die Liste die Unterkategorien aus dem gesamten Sortiment.
+
+War eine Unterkategorie ausgewählt und gibt es sie in der neuen Kategorie nicht,
+fällt die Auswahl von allein auf **Alle** zurück – so landest du nie auf einer leeren
+Seite. Das Feld ist optional; lässt du es leer, ändert sich an der Darstellung nichts.
+
+> Ein Tippfehler erzeugt eine neue Unterkategorie, kein Hinweis. „Gold“ und „gold“
+> sind zwei verschiedene Einträge. Schreib dir am besten auf, welche Begriffe du
+> verwendest.
 
 ## NSFW-Kennzeichnung
 
@@ -560,9 +593,8 @@ Fußzeile und auf der Sperrseite. Austauschbar im Admin unter **Einstellungen �
 Logo (Wortmarke)**.
 
 Format: Querformat mit transparentem Hintergrund, etwa 10:1 breit zu hoch, rund
-900 px breit. Weiße Schrift wird im hellen Design per CSS-Filter dunkel eingefärbt –
-**das klappt nur bei einfarbigen Logos.** Bei einem mehrfarbigen Logo müsste die
-Regel `.brand-logo` in `assets/style.css` angepasst werden.
+900 px breit. Die Seite ist durchgehend dunkel – eine helle, am besten weiße
+Schrift steht überall richtig, ohne dass am CSS etwas angepasst werden muss.
 
 `assets/favicon.png` ist nicht im CMS hinterlegt – die Datei direkt im Repository
 überschreiben (64 × 64 px) und die Zahl bei `favicon.png?v=2` in `index.html`

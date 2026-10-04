@@ -15,8 +15,8 @@
 
 /* ===================================================================
    JazzyBunny Studios – Layout und Design
-   Dunkel als Grundeinstellung, heller Modus über den Umschalter.
-   Die Akzentfarbe lässt sich im Admin überschreiben (--accent).
+   Durchgehend dunkel. Die Akzentfarbe lässt sich im Admin überschreiben
+   (--accent).
    =================================================================== */
 
 :root {
@@ -46,44 +46,6 @@
 
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display: "Gotham", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
-
-html[data-theme="light"] {
-  --new: #15914b;
-  --new-fg: #ffffff;
-  --gold: #8a6410;
-  --gold-fg: #ffffff;
-  --bg: #ffffff;
-  --bg-soft: #f4f4f7;
-  --bg-elev: #ffffff;
-  --bg-sunken: #ebebf0;
-  --fg: #131318;
-  --fg-muted: #5c5c6b;
-  --fg-dim: #86869a;
-  --border: #e4e4ec;
-  --border-strong: #cfcfda;
-  --accent-fg: #ffffff;
-  --shadow: 0 1px 2px rgba(18,18,26,.06), 0 12px 34px rgba(18,18,26,.10);
-}
-
-@media (prefers-color-scheme: light) {
-  html:not([data-theme]) {
-    --new: #15914b;
-    --new-fg: #ffffff;
-    --gold: #8a6410;
-    --gold-fg: #ffffff;
-    --bg: #ffffff;
-    --bg-soft: #f4f4f7;
-    --bg-elev: #ffffff;
-    --bg-sunken: #ebebf0;
-    --fg: #131318;
-    --fg-muted: #5c5c6b;
-    --fg-dim: #86869a;
-    --border: #e4e4ec;
-    --border-strong: #cfcfda;
-    --accent-fg: #ffffff;
-    --shadow: 0 1px 2px rgba(18,18,26,.06), 0 12px 34px rgba(18,18,26,.10);
-  }
 }
 
 /* ---------- Grundlagen ---------- */
@@ -198,21 +160,11 @@ body.maintenance-on .adminbar { display: none; }
 
 .brand { display: flex; align-items: center; text-decoration: none; margin-right: auto; min-width: 0; }
 
-/* Die Wortmarke ist weiße Schrift auf transparentem Grund. Im hellen Design
-   wird sie per Filter umgedreht, sonst wäre sie unsichtbar. Das funktioniert,
-   solange das Logo einfarbig ist – siehe Hinweis im Admin. */
+/* Die Wortmarke ist weiße Schrift auf transparentem Grund – passt so direkt
+   auf den dunklen Untergrund. */
 .brand-logo, .footer-logo, .maintenance-logo {
   height: auto; width: auto; object-fit: contain;
 }
-html[data-theme="light"] .brand-logo,
-html[data-theme="light"] .footer-logo,
-html[data-theme="light"] .maintenance-logo { filter: invert(1); }
-@media (prefers-color-scheme: light) {
-  html:not([data-theme]) .brand-logo,
-  html:not([data-theme]) .footer-logo,
-  html:not([data-theme]) .maintenance-logo { filter: invert(1); }
-}
-
 .brand-logo { width: min(300px, 44vw); }
 .brand-fallback {
   font-size: 1.05rem; font-weight: 900;
@@ -958,15 +910,6 @@ body.maintenance-on .site-footer { display: none; }
   font-size: clamp(1rem, 2vw, 1.1rem); white-space: pre-line;
 }
 .maintenance p:empty { display: none; }
-
-/* ---------- Umschalter-Symbole ---------- */
-.ico-sun { display: none; }
-html[data-theme="light"] .ico-sun { display: block; }
-html[data-theme="light"] .ico-moon { display: none; }
-@media (prefers-color-scheme: light) {
-  html:not([data-theme]) .ico-sun { display: block; }
-  html:not([data-theme]) .ico-moon { display: none; }
-}
 
 /* ---------- Mobil ---------- */
 @media (max-width: 1040px) {
