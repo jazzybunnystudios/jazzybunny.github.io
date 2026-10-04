@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-04T14:24:27.066019+02:00",
+  "updatedAt": "2026-10-04T14:26:17.561955+02:00",
   "stages": [
     {
       "id": "angenommen",
@@ -19,7 +19,20 @@
     {
       "id": "weiterverarbeitung",
       "label": "Weiterverarbeitung",
-      "orders": []
+      "orders": [
+        {
+          "code": "JB-2026-0001",
+          "items": [
+            {
+              "title": "Placeholder 3",
+              "image": "/images/uploads/bild_2026-08-02_180623977.png",
+              "productId": "123456",
+              "qty": 1,
+              "nsfw": false
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "verpackt",
